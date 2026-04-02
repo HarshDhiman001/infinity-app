@@ -3016,15 +3016,28 @@ function Login({onLogin}) {
   const handleGoogle=async()=>{
     setLoading(true); setError("");
     try {
-      const result=await signInWithPopup(auth,googleProvider);
-      const u=result.user;
-      const ref=doc(db,"users",u.uid);
-      const snap=await getDoc(ref);
-      if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
-      onLogin(u);
-    } catch(e){ setError("Google sign-in failed. Try again."); }
-    setLoading(false);
+      const {signInWithRedirect,getRedirectResult}=await import("firebase/auth");
+      await signInWithRedirect(auth,googleProvider);
+    } catch(e){ setError("Google sign-in failed: "+e.message); setLoading(false); }
   };
+
+  // Handle redirect result on page load
+  useEffect(()=>{
+    const checkRedirect=async()=>{
+      try {
+        const {getRedirectResult}=await import("firebase/auth");
+        const result=await getRedirectResult(auth);
+        if(result?.user){
+          const u=result.user;
+          const ref=doc(db,"users",u.uid);
+          const snap=await getDoc(ref);
+          if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
+          onLogin(u);
+        }
+      } catch(e){ console.error(e); }
+    };
+    checkRedirect();
+  },[]);
 
   const handleEmailLogin=async()=>{
     if(!email.trim()||!pw.trim()){setError("Please enter email and password.");return;}
