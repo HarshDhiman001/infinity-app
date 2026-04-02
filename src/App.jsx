@@ -3023,18 +3023,30 @@ function Login({onLogin}) {
   const handleGoogle=async()=>{
     setLoading(true); setError("");
     try {
-      const firebase=await import("./firebase");
-      const {signInWithPopup}=await import("firebase/auth");
-      const {doc,getDoc,setDoc,serverTimestamp}=await import("firebase/firestore");
-      const result=await signInWithPopup(firebase.auth,firebase.googleProvider);
-      const u=result.user;
-      const ref=doc(firebase.db,"users",u.uid);
-      const snap=await getDoc(ref);
-      if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
-      onLogin(u);
-    } catch(e){ setError("Google sign-in failed: "+e.code); }
-    setLoading(false);
+      const fb=await import("./firebase");
+      const {signInWithRedirect}=await import("firebase/auth");
+      await signInWithRedirect(fb.auth,fb.googleProvider);
+    } catch(e){ setError("Google sign-in failed. Try again."); setLoading(false); }
   };
+
+  useEffect(()=>{
+    const checkRedirect=async()=>{
+      try {
+        const fb=await import("./firebase");
+        const {getRedirectResult}=await import("firebase/auth");
+        const {doc,getDoc,setDoc,serverTimestamp}=await import("firebase/firestore");
+        const result=await getRedirectResult(fb.auth);
+        if(result?.user){
+          const u=result.user;
+          const ref=doc(fb.db,"users",u.uid);
+          const snap=await getDoc(ref);
+          if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
+          onLogin(u);
+        }
+      } catch(e){ console.error("redirect check:",e.code); }
+    };
+    checkRedirect();
+  },[]);
 
   const handleEmailLogin=async()=>{
     if(!email.trim()||!pw.trim()){setError("Please enter email and password.");return;}
