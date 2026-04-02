@@ -2101,12 +2101,19 @@ function Profile({onNav,user,history,onPost}) {
         )}
 
         {/* "Compete with me" CTA */}
-        <div style={{display:"flex",gap:8,marginBottom:18}}>
+        <div style={{display:"flex",gap:8,marginBottom:12}}>
           <button onClick={()=>onNav("challenges")} style={{flex:3,padding:"11px 0",borderRadius:50,background:"linear-gradient(135deg,#0D0F1A,#1A0A2E)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:12,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
             ⚔️ Challenge Me
           </button>
           <button onClick={()=>onNav("challenge-portfolio")} style={{flex:2,padding:"11px 0",borderRadius:50,background:"#fff",border:"1.5px solid var(--b2)",color:"var(--sub)",fontSize:12,fontWeight:700,cursor:"pointer"}}>📂 Portfolio</button>
         </div>
+        {/* Logout */}
+        <button onClick={async()=>{
+          try{const {signOut}=await import("firebase/auth");const fb=await import("./firebase");await signOut(fb.auth);}catch(e){}
+          onNav("login");
+        }} style={{width:"100%",padding:"11px",borderRadius:50,background:"#fff",border:"1.5px solid #FFCDD2",color:"#C62828",fontSize:12,fontWeight:700,cursor:"pointer",marginBottom:18,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+          🚪 Sign Out
+        </button>
         <div style={{display:"flex",gap:2,background:"#E8ECF4",borderRadius:14,padding:4,marginBottom:18}}>
           {[["overview","Overview"],["badges","Badges"],["portfolio","Portfolio"]].map(([k,l])=>(
             <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"9px",borderRadius:11,background:tab===k?"#fff":"none",border:"none",color:tab===k?"var(--text)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12,transition:"all .18s"}}>
