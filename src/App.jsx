@@ -3010,6 +3010,39 @@ function Feed({onNav,user,notifs,notifCount,onMarkAllRead,challenges,submissions
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
+const loginInputStyle={width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #E4EAF6",fontSize:13,color:"#1A1A2E",outline:"none",background:"#F8FAFD",boxSizing:"border-box",fontFamily:"inherit"};
+
+function LoginWrapper({children,onBack}) {
+  return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#EFF4FB,#E8EDFB)",display:"flex",flexDirection:"column"}}>
+      <div style={{padding:"52px 20px 0",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+        {onBack&&<button onClick={onBack} style={{position:"absolute",left:20,width:34,height:34,borderRadius:"50%",background:"#fff",border:"1px solid #E0E8F4",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+        </button>}
+        <div style={{fontSize:18,fontWeight:900,color:"#1A4FD6",letterSpacing:"-.02em",display:"flex",alignItems:"center",gap:8}}>
+          <svg width="24" height="14" viewBox="0 0 60 34" fill="none"><path d="M30 17C30 17 20 4 10 4C2 4 2 30 10 30C20 30 30 17 30 17Z" stroke="#1A4FD6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><path d="M30 17C30 17 40 4 50 4C58 4 58 30 50 30C40 30 30 17 30 17Z" stroke="#7C3AED" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Infinity
+        </div>
+      </div>
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"20px 20px 40px"}}>
+        <div style={{background:"#fff",borderRadius:24,padding:"28px 24px",boxShadow:"0 4px 24px rgba(15,28,63,.08)"}}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoginDivider() {
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:10,margin:"18px 0"}}>
+      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
+      <span style={{fontSize:12,color:"#bbb",fontWeight:500}}>or</span>
+      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
+    </div>
+  );
+}
+
 function Login({onLogin}) {
   const [screen,setScreen]=useState("login");
   const [email,setEmail]=useState("");
@@ -3019,15 +3052,6 @@ function Login({onLogin}) {
   const [agreed,setAgreed]=useState(false);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
-
-  const handleGoogle=async()=>{
-    setLoading(true); setError("");
-    try {
-      const fb=await import("./firebase");
-      const {signInWithRedirect}=await import("firebase/auth");
-      await signInWithRedirect(fb.auth,fb.googleProvider);
-    } catch(e){ setError("Google sign-in failed. Try again."); setLoading(false); }
-  };
 
   useEffect(()=>{
     const checkRedirect=async()=>{
@@ -3043,19 +3067,28 @@ function Login({onLogin}) {
           if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
           onLogin(u);
         }
-      } catch(e){ console.error("redirect check:",e.code); }
+      } catch(e){ console.error("redirect:",e.code); }
     };
     checkRedirect();
-  },[]);
+  },[onLogin]);
+
+  const handleGoogle=async()=>{
+    setLoading(true); setError("");
+    try {
+      const fb=await import("./firebase");
+      const {signInWithRedirect}=await import("firebase/auth");
+      await signInWithRedirect(fb.auth,fb.googleProvider);
+    } catch(e){ setError("Google sign-in failed. Try again."); setLoading(false); }
+  };
 
   const handleEmailLogin=async()=>{
     if(!email.trim()||!pw.trim()){setError("Please enter email and password.");return;}
     setLoading(true); setError("");
     try {
-      const firebase=await import("./firebase");
+      const fb=await import("./firebase");
       const {signInWithEmailAndPassword}=await import("firebase/auth");
-      await signInWithEmailAndPassword(firebase.auth,email,pw);
-      onLogin({email});
+      const result=await signInWithEmailAndPassword(fb.auth,email,pw);
+      onLogin(result.user);
     } catch(e){ setError(e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"?"Wrong email or password.":"Login failed. Try again."); }
     setLoading(false);
   };
@@ -3066,72 +3099,44 @@ function Login({onLogin}) {
     if(pw.length<6){setError("Password must be at least 6 characters.");return;}
     setLoading(true); setError("");
     try {
-      const firebase=await import("./firebase");
+      const fb=await import("./firebase");
       const {createUserWithEmailAndPassword,updateProfile}=await import("firebase/auth");
       const {doc,setDoc,serverTimestamp}=await import("firebase/firestore");
-      const result=await createUserWithEmailAndPassword(firebase.auth,email,pw);
+      const result=await createUserWithEmailAndPassword(fb.auth,email,pw);
       await updateProfile(result.user,{displayName:name});
-      const ref=doc(firebase.db,"users",result.user.uid);
+      const ref=doc(fb.db,"users",result.user.uid);
       await setDoc(ref,{uid:result.user.uid,name,email,avatar:null,createdAt:serverTimestamp(),streak:0,xp:0});
       onLogin(result.user);
     } catch(e){ setError(e.code==="auth/email-already-in-use"?"Email already registered. Sign in instead.":"Signup failed. Try again."); }
     setLoading(false);
   };
 
-  const inputStyle={width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #E4EAF6",fontSize:13,color:"#1A1A2E",outline:"none",background:"#F8FAFD",boxSizing:"border-box",fontFamily:"inherit"};
-
-  const Wrapper=({children})=>(
-    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#EFF4FB,#E8EDFB)",display:"flex",flexDirection:"column"}}>
-      <div style={{padding:"52px 20px 0",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-        {screen==="signup"&&<button onClick={()=>{setScreen("login");setError("");}} style={{position:"absolute",left:20,width:34,height:34,borderRadius:"50%",background:"#fff",border:"1px solid #E0E8F4",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-        </button>}
-        <div style={{fontSize:18,fontWeight:900,color:"#1A4FD6",letterSpacing:"-.02em",display:"flex",alignItems:"center",gap:8}}>
-          <svg width="24" height="14" viewBox="0 0 60 34" fill="none"><path d="M30 17C30 17 20 4 10 4C2 4 2 30 10 30C20 30 30 17 30 17Z" stroke="#1A4FD6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><path d="M30 17C30 17 40 4 50 4C58 4 58 30 50 30C40 30 30 17 30 17Z" stroke="#7C3AED" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          Infinity
-        </div>
-      </div>
-      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"20px 20px 40px"}}>
-        <div style={{background:"#fff",borderRadius:24,padding:"28px 24px",boxShadow:"0 4px 24px rgba(15,28,63,.08)"}}>
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-
-  const GoogleBtn=()=>(
-    <button onClick={handleGoogle} disabled={loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"13px",background:loading?"#f5f5f5":"#fff",border:"1.5px solid #E4EAF6",borderRadius:50,fontSize:14,fontWeight:700,color:"#1A1A2E",cursor:loading?"not-allowed":"pointer",boxShadow:"0 2px 8px rgba(15,28,63,.07)",transition:"all .2s"}}>
+  const GoogleBtn=(
+    <button onClick={handleGoogle} disabled={loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"13px",background:loading?"#f5f5f5":"#fff",border:"1.5px solid #E4EAF6",borderRadius:50,fontSize:14,fontWeight:700,color:"#1A1A2E",cursor:loading?"not-allowed":"pointer",boxShadow:"0 2px 8px rgba(15,28,63,.07)"}}>
       <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
       {loading?"Signing in...":"Continue with Google"}
     </button>
   );
 
-  const Divider=()=>(
-    <div style={{display:"flex",alignItems:"center",gap:10,margin:"18px 0"}}>
-      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
-      <span style={{fontSize:12,color:"#bbb",fontWeight:500}}>or</span>
-      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
-    </div>
+  const ErrorBox=error&&(
+    <div style={{background:"#FFF0F0",border:"1px solid #FFCDD2",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#C62828",marginBottom:14,textAlign:"center"}}>{error}</div>
   );
 
   if(screen==="login") return (
-    <Wrapper>
+    <LoginWrapper>
       <div style={{fontSize:22,fontWeight:900,color:"#1A1A2E",marginBottom:4,textAlign:"center"}}>Welcome back 👋</div>
       <div style={{fontSize:13,color:"#aaa",textAlign:"center",marginBottom:22}}>Sign in to continue your journey</div>
-
-      <GoogleBtn/>
-      <Divider/>
-
-      {error&&<div style={{background:"#FFF0F0",border:"1px solid #FFCDD2",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#C62828",marginBottom:14,textAlign:"center"}}>{error}</div>}
-
+      {GoogleBtn}
+      <LoginDivider/>
+      {ErrorBox}
       <div style={{marginBottom:12}}>
         <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Email</label>
-        <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
+        <input style={loginInputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
       </div>
       <div style={{marginBottom:10}}>
         <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Password</label>
         <div style={{position:"relative"}}>
-          <input style={{...inputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
+          <input style={{...loginInputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
           <button onClick={()=>setShowPw(v=>!v)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#aaa",fontSize:16,padding:0}}>{showPw?"👁":"🙈"}</button>
         </div>
       </div>
@@ -3144,31 +3149,28 @@ function Login({onLogin}) {
       <div style={{textAlign:"center",marginTop:18,fontSize:12,color:"#aaa"}}>
         Don't have an account? <span onClick={()=>{setScreen("signup");setError("");}} style={{color:"#1A4FD6",fontWeight:700,cursor:"pointer"}}>Sign up</span>
       </div>
-    </Wrapper>
+    </LoginWrapper>
   );
 
   return (
-    <Wrapper>
+    <LoginWrapper onBack={()=>{setScreen("login");setError("");}}>
       <div style={{fontSize:22,fontWeight:900,color:"#1A1A2E",marginBottom:4,textAlign:"center"}}>Create Account 🚀</div>
       <div style={{fontSize:13,color:"#aaa",textAlign:"center",marginBottom:22}}>Join 12,000+ students on Infinity</div>
-
-      <GoogleBtn/>
-      <Divider/>
-
-      {error&&<div style={{background:"#FFF0F0",border:"1px solid #FFCDD2",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#C62828",marginBottom:14,textAlign:"center"}}>{error}</div>}
-
+      {GoogleBtn}
+      <LoginDivider/>
+      {ErrorBox}
       <div style={{marginBottom:12}}>
         <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Full Name</label>
-        <input style={inputStyle} type="text" placeholder="Your full name" value={name} onChange={e=>setName(e.target.value)}/>
+        <input style={loginInputStyle} type="text" placeholder="Your full name" value={name} onChange={e=>setName(e.target.value)}/>
       </div>
       <div style={{marginBottom:12}}>
         <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Email</label>
-        <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/>
+        <input style={loginInputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/>
       </div>
       <div style={{marginBottom:16}}>
         <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Password <span style={{color:"#bbb",fontWeight:400}}>(min 6 chars)</span></label>
         <div style={{position:"relative"}}>
-          <input style={{...inputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)}/>
+          <input style={{...loginInputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)}/>
           <button onClick={()=>setShowPw(v=>!v)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#aaa",fontSize:16,padding:0}}>{showPw?"👁":"🙈"}</button>
         </div>
       </div>
@@ -3182,7 +3184,7 @@ function Login({onLogin}) {
       <div style={{textAlign:"center",marginTop:18,fontSize:12,color:"#aaa"}}>
         Already have an account? <span onClick={()=>{setScreen("login");setError("");}} style={{color:"#1A4FD6",fontWeight:700,cursor:"pointer"}}>Sign in</span>
       </div>
-    </Wrapper>
+    </LoginWrapper>
   );
 }
 
