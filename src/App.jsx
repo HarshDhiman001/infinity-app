@@ -3016,37 +3016,28 @@ function Login({onLogin}) {
   const handleGoogle=async()=>{
     setLoading(true); setError("");
     try {
-      const {signInWithRedirect,getRedirectResult}=await import("firebase/auth");
-      await signInWithRedirect(auth,googleProvider);
-    } catch(e){ setError("Google sign-in failed: "+e.message); setLoading(false); }
+      const firebase=await import("./firebase");
+      const {signInWithPopup}=await import("firebase/auth");
+      const {doc,getDoc,setDoc,serverTimestamp}=await import("firebase/firestore");
+      const result=await signInWithPopup(firebase.auth,firebase.googleProvider);
+      const u=result.user;
+      const ref=doc(firebase.db,"users",u.uid);
+      const snap=await getDoc(ref);
+      if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
+      onLogin(u);
+    } catch(e){ setError("Google sign-in failed: "+e.code); }
+    setLoading(false);
   };
-
-  // Handle redirect result on page load
-  useEffect(()=>{
-    const checkRedirect=async()=>{
-      try {
-        const {getRedirectResult}=await import("firebase/auth");
-        const result=await getRedirectResult(auth);
-        if(result?.user){
-          const u=result.user;
-          const ref=doc(db,"users",u.uid);
-          const snap=await getDoc(ref);
-          if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
-          onLogin(u);
-        }
-      } catch(e){ console.error(e); }
-    };
-    checkRedirect();
-  },[]);
 
   const handleEmailLogin=async()=>{
     if(!email.trim()||!pw.trim()){setError("Please enter email and password.");return;}
     setLoading(true); setError("");
     try {
+      const firebase=await import("./firebase");
       const {signInWithEmailAndPassword}=await import("firebase/auth");
-      await signInWithEmailAndPassword(auth,email,pw);
+      await signInWithEmailAndPassword(firebase.auth,email,pw);
       onLogin({email});
-    } catch(e){ setError(e.code==="auth/invalid-credential"?"Wrong email or password.":"Login failed. Try again."); }
+    } catch(e){ setError(e.code==="auth/invalid-credential"||e.code==="auth/wrong-password"?"Wrong email or password.":"Login failed. Try again."); }
     setLoading(false);
   };
 
@@ -3056,10 +3047,12 @@ function Login({onLogin}) {
     if(pw.length<6){setError("Password must be at least 6 characters.");return;}
     setLoading(true); setError("");
     try {
+      const firebase=await import("./firebase");
       const {createUserWithEmailAndPassword,updateProfile}=await import("firebase/auth");
-      const result=await createUserWithEmailAndPassword(auth,email,pw);
+      const {doc,setDoc,serverTimestamp}=await import("firebase/firestore");
+      const result=await createUserWithEmailAndPassword(firebase.auth,email,pw);
       await updateProfile(result.user,{displayName:name});
-      const ref=doc(db,"users",result.user.uid);
+      const ref=doc(firebase.db,"users",result.user.uid);
       await setDoc(ref,{uid:result.user.uid,name,email,avatar:null,createdAt:serverTimestamp(),streak:0,xp:0});
       onLogin(result.user);
     } catch(e){ setError(e.code==="auth/email-already-in-use"?"Email already registered. Sign in instead.":"Signup failed. Try again."); }
