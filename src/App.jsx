@@ -1,4 +1,19 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, Component } from "react";
+
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(e) { return { error: e }; }
+  render() {
+    if (this.state.error) return (
+      <div style={{padding:24,fontFamily:"monospace",background:"#fff0f0",minHeight:"100vh"}}>
+        <h2 style={{color:"#c00",marginBottom:12}}>Runtime Error</h2>
+        <pre style={{whiteSpace:"pre-wrap",fontSize:13,color:"#333"}}>{this.state.error?.message}</pre>
+        <pre style={{whiteSpace:"pre-wrap",fontSize:11,color:"#888",marginTop:12}}>{this.state.error?.stack}</pre>
+      </div>
+    );
+    return this.props.children;
+  }
+}
 
 const AVATARS = [
   "https://api.dicebear.com/7.x/adventurer/svg?seed=aarav",
@@ -81,7 +96,7 @@ const FEED_POSTS = [
     tags:["#streak","#consistency","#neet","#motivation"], imageUrl:null, likes:5621, comments:834, saves:2341, time:"6h ago" },
 
   { id:7, studentId:3, name:"Ishaan Verma", avatar:ALL_AVATARS[2], stream:"nonmedical", subject:"🚀 Challenge Win", day:"Day 88", hours:0, xp:620,
-    text:"WON THE UNACADEMY PHYSICS CHALLENGE. 🥇\n\nRank 1 out of 312 submissions.\n\nBuilt the projectile simulator in React + Canvas API. Got an email from Unacademy HR this morning for an internship interview.\n\nI was just a student 3 months ago.\n\nLearnLoop literally changed the trajectory (pun intended 🎯) of my life.\n\nBuilding in public works. Submit to challenges. GET. SEEN.",
+    text:"WON THE UNACADEMY PHYSICS CHALLENGE. 🥇\n\nRank 1 out of 312 submissions.\n\nBuilt the projectile simulator in React + Canvas API. Got an email from Unacademy HR this morning for an internship interview.\n\nI was just a student 3 months ago.\n\nInfinity literally changed the trajectory (pun intended 🎯) of my life.\n\nBuilding in public works. Submit to challenges. GET. SEEN.",
     tags:["#win","#challenge","#coding","#internship"], imageUrl:"https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=700&q=80", likes:4231, comments:623, saves:1870, time:"8h ago" },
 
   // ── EDUCATIONAL / CONCEPT POSTS ───────────────────────────────────────────
@@ -246,7 +261,95 @@ const INIT_NOTIFS = [
   { id:3, text:"Unacademy shortlisted you from Challenge #1 — check Opportunities",  time:"1h ago",  read:false, icon:"💼" },
   { id:4, text:"You earned the Fast Builder badge ⚡ Companies can see this now",    time:"2h ago",  read:true,  icon:"🏅" },
   { id:5, text:"You moved to #2 on the Physics Simulation live leaderboard!",        time:"3h ago",  read:true,  icon:"⬆️" },
+  { id:6, text:"🔥 Don't break your 47-day streak! Log your study session today before midnight.", time:"4h ago", read:false, icon:"🔥" },
+  { id:7, text:"⚠️ You dropped from #2 to #4 on the JEE Physics leaderboard. Ishaan Verma overtook you!", time:"5h ago", read:false, icon:"⚠️" },
+  { id:8, text:"Kavya Reddy commented on your answer: \"This is the clearest explanation I've seen 🔥\"", time:"6h ago", read:false, icon:"💬" },
 ];
+
+const DAILY_QUESTIONS = [
+  {
+    id:1,
+    date:"Today",
+    category:"🧠 Focus & Attention",
+    question:"You sit down to study. Within 5 minutes your phone buzzes. What do you do?",
+    options:["Check it immediately — might be important","Ignore it and keep studying","Check it quickly then get back","Put it face-down but keep thinking about it"],
+    insights:[
+      {title:"Impulse Responder",emoji:"⚡",color:"#EF4444",insight:"You prioritise immediate stimuli over long-term goals. Your brain's reward circuit fires strongly. Practice: 25-min phone-free blocks. Start with 1 per day.",tip:"Your dopamine system is highly reactive. Use it — reward yourself AFTER the block."},
+      {title:"Deep Focuser",emoji:"🎯",color:"#0A9B6A",insight:"Strong prefrontal cortex control. You can delay gratification — a key predictor of exam success. Your brain enters flow states more easily.",tip:"You have a rare cognitive edge. Protect your deep work time fiercely — it's your superpower."},
+      {title:"Balanced Checker",emoji:"⚖️",color:"#F59E0B",insight:"You compromise between focus and social awareness. Moderate impulse control. The 'quick check' often becomes 5 minutes — build stricter rules.",tip:"Try the 'parking lot' method: write down what you want to check, do it only after the session."},
+      {title:"Anxious Ignorer",emoji:"😰",color:"#7C3AED",insight:"You resist the urge but it occupies mental bandwidth — a form of 'cognitive leakage'. Your willpower is draining just by resisting.",tip:"Remove the temptation entirely. Phone in another room = 40% better focus. Don't fight your brain — design around it."},
+    ],
+    xp:50, participants:1247,
+  },
+  {
+    id:2,
+    date:"Yesterday",
+    category:"😴 Memory & Sleep",
+    question:"You studied a topic last night. This morning you can barely recall it. Your first thought is:",
+    options:["I'm just bad at this subject","I didn't study hard enough","I probably didn't sleep enough","The topic is genuinely difficult"],
+    insights:[
+      {title:"Self-Doubter",emoji:"😔",color:"#EF4444",insight:"You attribute memory failure to fixed ability. This is the 'fixed mindset' pattern. Memory is a skill, not a trait — it's trainable.",tip:"Reframe: 'I haven't learned HOW to retain this yet.' Spaced repetition is your fix, not more hours."},
+      {title:"Effort Blamer",emoji:"📚",color:"#F59E0B",insight:"You believe in effort — good! But you may be studying inefficiently. More hours ≠ better retention without the right techniques.",tip:"Add active recall: close the book, write what you remember. This doubles retention vs rereading."},
+      {title:"Sleep Scientist",emoji:"🌙",color:"#0A9B6A",insight:"You're right. Memory consolidation happens during sleep — specifically in REM. Without 7-8 hours, memories don't transfer to long-term storage.",tip:"Sleep is not laziness. It's when your brain literally saves your study session to disk."},
+      {title:"Task Analyst",emoji:"🔬",color:"#1A4FD6",insight:"Objective thinking — good. But difficulty alone doesn't explain forgetting. The brain forgets 80% of new info within 24hrs without review.",tip:"Use the Ebbinghaus curve: review at 1 day, 3 days, 7 days, 21 days. This beats all other methods."},
+    ],
+    xp:45, participants:1089,
+  },
+  {
+    id:3,
+    date:"2 days ago",
+    category:"😤 Stress & Performance",
+    question:"Mock exam tomorrow. You feel your heart rate rising while studying tonight. You:",
+    options:["Push through — no time for feelings","Tell yourself to calm down","Take 5 deep breaths and refocus","Convince yourself exams don't matter"],
+    insights:[
+      {title:"Suppressor",emoji:"💪",color:"#EF4444",insight:"Pushing through anxiety spikes cortisol, which directly impairs memory encoding. What you study while highly stressed is harder to recall under pressure.",tip:"Your body is signalling overload. Ignoring it costs performance. Stress management = exam performance."},
+      {title:"Verbal Calmer",emoji:"🗣️",color:"#F59E0B",insight:"Telling yourself to calm down often backfires — it focuses attention on the anxiety. Research shows this raises heart rate further.",tip:"Instead say: 'I'm excited.' Reframing anxiety as excitement uses the same physiological state but improves performance by 22%."},
+      {title:"Physiological Reset",emoji:"🫁",color:"#0A9B6A",insight:"5 deep breaths activates the vagus nerve, switching your nervous system from fight-or-flight to rest-and-digest. This is the single fastest evidence-based stress tool.",tip:"Try box breathing: 4 counts in, hold 4, out 4, hold 4. Used by Navy SEALs before high-stakes situations."},
+      {title:"Minimiser",emoji:"🙈",color:"#7C3AED",insight:"Minimising the importance protects ego short-term but reduces motivation. Your brain won't allocate resources to things you've told it don't matter.",tip:"Healthy reframe: 'This matters AND I can handle it.' Both truths together build resilience without avoidance."},
+    ],
+    xp:55, participants:1356,
+  },
+  {
+    id:4,
+    date:"3 days ago",
+    category:"🎯 Goal Setting",
+    question:"You set a goal to study 10 hours today. By evening you've done 6. You feel:",
+    options:["Like a failure — missed by 40%","Okay — 6 hours is still good","Motivated to make up tomorrow","Disappointed but analysing why"],
+    insights:[
+      {title:"All-or-Nothing Thinker",emoji:"⬛",color:"#EF4444",insight:"Binary thinking — you either hit the goal or failed. This cognitive pattern leads to the 'what-the-hell effect': since I failed, might as well quit entirely.",tip:"Progress > perfection. 6 hours of quality study beats 10 hours of distracted grinding. Measure consistency, not daily maximums."},
+      {title:"Compassionate Realist",emoji:"✅",color:"#0A9B6A",insight:"Healthy self-assessment. You acknowledge effort without catastrophising. This emotional regulation pattern correlates with long-term study consistency.",tip:"This is the mindset of toppers. They don't beat themselves up — they adjust and continue."},
+      {title:"Tomorrow Optimizer",emoji:"🔄",color:"#1A4FD6",insight:"Future-focused — good resilience signal. Watch for 'tomorrow' becoming a pattern. Consistent daily effort beats compensation spikes.",tip:"Ask: can I do 30 more minutes tonight instead? Small completions matter more than big catch-ups."},
+      {title:"Analytical Reflector",emoji:"🔍",color:"#7C3AED",insight:"Self-awareness combined with analysis is a rare and powerful combination. You're using failure as data, not identity.",tip:"Keep a 2-line study journal: what worked, what didn't. This metacognitive habit can raise exam scores by 15-20%."},
+    ],
+    xp:50, participants:978,
+  },
+  {
+    id:5,
+    date:"4 days ago",
+    category:"🧩 Learning Style",
+    question:"You've read the same paragraph 4 times and still don't understand it. You:",
+    options:["Read it a 5th time, slower","Skip it and come back later","Try to explain it aloud to yourself","Search for a video or diagram"],
+    insights:[
+      {title:"Persistence Looper",emoji:"🔁",color:"#EF4444",insight:"Re-reading the same text is the least effective study method (ranked last in cognitive science studies). More repetition of the same input = diminishing returns.",tip:"Switch input modality. If reading isn't working, your brain needs a different encoding pathway."},
+      {title:"Strategic Skipper",emoji:"⏭️",color:"#F59E0B",insight:"Context-switching can help — sometimes later content clarifies earlier content. But avoidance disguised as strategy is common here.",tip:"Come back with a time limit: 'I'll revisit this in 10 mins.' If still stuck, that's your signal to change approach."},
+      {title:"Verbal Processor",emoji:"🗣️",color:"#0A9B6A",insight:"Explaining aloud (the Feynman Technique) is one of the most powerful learning methods. It forces you to identify exactly where your understanding breaks down.",tip:"Can't explain it simply? That's where to focus. Teach it to an imaginary 10-year-old. Works for every subject."},
+      {title:"Visual Learner",emoji:"🎨",color:"#7C3AED",insight:"Seeking visual context activates different neural pathways. Combining text + visual = dual-coding, which significantly improves retention.",tip:"Draw a diagram of every concept you study. Even a rough sketch activates spatial memory alongside verbal memory."},
+    ],
+    xp:45, participants:1123,
+  },
+];
+
+const BATTLE_LEADERBOARD=[
+  {rank:1,name:"Priya Menon",   avatar:ALL_AVATARS[0], streak:18, xp:900,  badge:"🥇"},
+  {rank:2,name:"Kavya Reddy",   avatar:ALL_AVATARS[7], streak:15, xp:750,  badge:"🥈"},
+  {rank:3,name:"Ishaan Verma",  avatar:ALL_AVATARS[2], streak:14, xp:700,  badge:"🥉"},
+  {rank:4,name:"Aarav Sharma",  avatar:ALL_AVATARS[3], streak:12, xp:600,  badge:""},
+  {rank:5,name:"Neha Gupta",    avatar:ALL_AVATARS[1], streak:11, xp:550,  badge:""},
+  {rank:6,name:"Simran Kaur",   avatar:ALL_AVATARS[4], streak:9,  xp:450,  badge:""},
+  {rank:7,name:"Rohan Desai",   avatar:ALL_AVATARS[5], streak:7,  xp:350,  badge:""},
+  {rank:8,name:"Tanvi Shah",    avatar:ALL_AVATARS[8], streak:6,  xp:300,  badge:""},
+];
+
 
 const OPPORTUNITIES = [
   { id:1, company:"Unacademy", logo:"🎓", type:"EdTech Internship",    title:"Physics Content Creator",  stipend:"₹15,000/mo", duration:"3 months", stream:"nonmedical", skills:["Physics"], match:96 },
@@ -309,6 +412,9 @@ const css = `
   @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
   @keyframes spin{to{transform:rotate(360deg)}}
   @keyframes slideInRight{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+  @keyframes slideDown{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes livePop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}
   .pulse-dot{animation:pulse 1.8s infinite}
   .live-pop{animation:livePop .4s ease both}
@@ -407,28 +513,564 @@ function CompanyTicker() {
   );
 }
 
+// ─── Chat Data ────────────────────────────────────────────────────────────────
+const CHAT_THREADS = [
+  {
+    id:1, studentId:1,
+    name:"Priya Menon", avatar:ALL_AVATARS[0], verified:true, online:true,
+    lastMsg:"Did you finish the Organic Chem mock? 🔥", lastTime:"Just now", unread:3,
+    msgs:[
+      {id:1,  from:"them", text:"Hey Aarav! Have you started the Unacademy challenge?",        time:"10:02 AM"},
+      {id:2,  from:"me",   text:"Just started it last night. The Physics section is tough 😅",  time:"10:04 AM"},
+      {id:3,  from:"them", text:"Same! The wave optics problem took me 20 min",                 time:"10:05 AM"},
+      {id:4,  from:"me",   text:"I got 68% on the mock. Not happy lol",                         time:"10:06 AM"},
+      {id:5,  from:"them", text:"That's still better than me 😭 I got 61%",                     time:"10:08 AM"},
+      {id:6,  from:"them", text:"Did you finish the Organic Chem mock? 🔥",                     time:"10:09 AM"},
+    ]
+  },
+  {
+    id:2, studentId:3,
+    name:"Ishaan Verma", avatar:ALL_AVATARS[2], verified:true, online:true,
+    lastMsg:"Bro the JEE paper leak rumours are wild 💀", lastTime:"3:24 PM", unread:1,
+    msgs:[
+      {id:1,  from:"them", text:"Yo did you see the new JEE mains schedule?",                   time:"3:10 PM"},
+      {id:2,  from:"me",   text:"Yeah Jan 22 session. I'm nervous ngl",                         time:"3:12 PM"},
+      {id:3,  from:"them", text:"Bro the JEE paper leak rumours are wild 💀",                   time:"3:24 PM"},
+    ]
+  },
+  {
+    id:3, studentId:8,
+    name:"Kavya Reddy", avatar:ALL_AVATARS[7], verified:true, online:false,
+    lastMsg:"Thank you!! Good luck to you too 💪", lastTime:"Yesterday", unread:0,
+    msgs:[
+      {id:1,  from:"me",   text:"Kavya your Bio notes are insane, saved my NEET prep 🙏",       time:"Yesterday"},
+      {id:2,  from:"them", text:"Haha glad they helped! Took me weeks to make those",           time:"Yesterday"},
+      {id:3,  from:"me",   text:"All the best for NEET! You're gonna crush it 🔥",              time:"Yesterday"},
+      {id:4,  from:"them", text:"Thank you!! Good luck to you too 💪",                          time:"Yesterday"},
+    ]
+  },
+];
+
+// ─── Chat List ────────────────────────────────────────────────────────────────
+function ChatList({onNav,user,onPost}) {
+  const [openThread,setOpenThread]=useState(null);
+  if(openThread!=null) return <ChatThread thread={CHAT_THREADS.find(t=>t.id===openThread)} user={user} onBack={()=>setOpenThread(null)}/>;
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",flexDirection:"column"}}>
+      {/* Header */}
+      <div style={{padding:"56px 20px 16px",position:"relative"}}>
+
+        <div style={{position:"relative"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:20}}>
+            <div>
+              <div style={{fontSize:26,fontWeight:900,color:"var(--text)",letterSpacing:"-.03em"}}>Messages</div>
+              <div style={{fontSize:12,color:"rgba(255,255,255,.35)",marginTop:2}}>Stay connected with your study crew</div>
+            </div>
+            <button style={{width:40,height:40,borderRadius:"50%",background:"#EEF2FF",border:"1px solid var(--b2)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
+          </div>
+          {/* Search bar */}
+          <div style={{display:"flex",alignItems:"center",gap:10,background:"#fff",borderRadius:14,padding:"11px 14px",border:"1px solid var(--b1)",boxShadow:"0 1px 4px rgba(15,28,63,.06)"}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span style={{fontSize:13,color:"rgba(255,255,255,.25)"}}>Search messages...</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Active now row */}
+      <div style={{padding:"0 20px 18px"}}>
+        <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",letterSpacing:".06em",textTransform:"uppercase",marginBottom:12}}>Active Now</div>
+        <div style={{display:"flex",gap:14,overflowX:"auto",paddingBottom:4}}>
+          {/* New message button */}
+          <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,flexShrink:0}}>
+            <div style={{width:56,height:56,borderRadius:"50%",background:"#EEF2FF",border:"1.5px dashed rgba(26,79,214,.3)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <span style={{fontSize:10,color:"rgba(255,255,255,.3)",fontWeight:600}}>New</span>
+          </div>
+          {CHAT_THREADS.filter(t=>t.online).map(t=>(
+            <div key={t.id} onClick={()=>setOpenThread(t.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,flexShrink:0,cursor:"pointer"}}>
+              <div style={{position:"relative"}}>
+                <div style={{width:56,height:56,borderRadius:"50%",padding:2,background:`conic-gradient(${STREAM[STUDENTS.find(s=>s.id===t.studentId)?.stream]?.color||"#1A4FD6"},#7C3AED,${STREAM[STUDENTS.find(s=>s.id===t.studentId)?.stream]?.color||"#1A4FD6"})`}}>
+                  <img src={t.avatar} width={52} height={52} style={{borderRadius:"50%",display:"block",border:"2px solid #0D0F1A",objectFit:"cover"}}/>
+                </div>
+                <div style={{position:"absolute",bottom:2,right:2,width:12,height:12,borderRadius:"50%",background:"#0A9B6A",border:"2px solid #0D0F1A"}} className="pulse-dot"/>
+              </div>
+              <span style={{fontSize:10,color:"var(--sub)",fontWeight:600,maxWidth:56,textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.name.split(" ")[0]}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{height:1,background:"var(--b1)",margin:"0 0 4px"}}/>
+
+      {/* Thread list */}
+      <div style={{flex:1,overflowY:"auto",paddingBottom:90}}>
+        <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",letterSpacing:".06em",textTransform:"uppercase",padding:"14px 20px 8px"}}>All Messages</div>
+        {CHAT_THREADS.map(t=>(
+          <div key={t.id} onClick={()=>setOpenThread(t.id)} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 20px",cursor:"pointer",borderBottom:"1px solid var(--b1)",transition:"background .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.04)"}
+            onMouseLeave={e=>e.currentTarget.style.background="transparent"}
+          >
+            {/* Avatar */}
+            <div style={{position:"relative",flexShrink:0}}>
+              <img src={t.avatar} width={54} height={54} style={{borderRadius:"50%",display:"block",border:`2px solid ${t.unread>0?"#1A4FD6":"var(--b1)"}`,objectFit:"cover"}}/>
+              {t.online&&<div style={{position:"absolute",bottom:2,right:2,width:12,height:12,borderRadius:"50%",background:"#0A9B6A",border:"2px solid #0D0F1A"}} className="pulse-dot"/>}
+            </div>
+            {/* Content */}
+            <div style={{flex:1,minWidth:0}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+                <div style={{display:"flex",alignItems:"center",gap:5}}>
+                  <span style={{fontWeight:t.unread>0?800:600,fontSize:14,color:t.unread>0?"var(--text)":"var(--sub)"}}>{t.name}</span>
+                  {t.verified&&<span style={{fontSize:9,color:"#34D399"}}>✔</span>}
+                </div>
+                <span style={{fontSize:11,color:"var(--muted)",flexShrink:0}}>{t.lastTime}</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8}}>
+                <span style={{fontSize:12,color:t.unread>0?"var(--sub)":"var(--muted)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",fontWeight:t.unread>0?600:400}}>{t.lastMsg}</span>
+                {t.unread>0&&<div style={{width:20,height:20,borderRadius:"50%",background:"#1A4FD6",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:800,color:"#fff",flexShrink:0}}>{t.unread}</div>}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <BottomNav onNav={onNav} active="chat" user={user} onPost={onPost}/>
+    </div>
+  );
+}
+
+// ─── Chat Thread ──────────────────────────────────────────────────────────────
+function ChatThread({thread,user,onBack}) {
+  const [msgs,setMsgs]=useState(thread.msgs);
+  const [input,setInput]=useState("");
+  const endRef=useRef(null);
+  const str=STREAM[STUDENTS.find(s=>s.id===thread.studentId)?.stream];
+
+  useEffect(()=>{ endRef.current?.scrollIntoView({behavior:"smooth"}); },[msgs]);
+
+  const send=()=>{
+    if(!input.trim()) return;
+    setMsgs(m=>[...m,{id:Date.now(),from:"me",text:input.trim(),time:"Now"}]);
+    setInput("");
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,background:"var(--bg)",display:"flex",flexDirection:"column",zIndex:250,animation:"slideInRight .22s ease"}}>
+      {/* Header */}
+      <div style={{flexShrink:0,padding:"52px 16px 12px",background:"rgba(255,255,255,.97)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,.07)",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 80% 100% at 50% -20%,${str?.color||"#1A4FD6"}22 0%,transparent 60%)`}}/>
+        <div style={{position:"relative",display:"flex",alignItems:"center",gap:12}}>
+          <button onClick={onBack} style={{width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.12)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",flexShrink:0,cursor:"pointer"}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          {/* Avatar */}
+          <div style={{position:"relative",flexShrink:0}}>
+            <div style={{width:44,height:44,borderRadius:"50%",padding:2,background:`conic-gradient(${str?.color||"#1A4FD6"},#7C3AED,${str?.color||"#1A4FD6"})`}}>
+              <img src={thread.avatar} width={40} height={40} style={{borderRadius:"50%",display:"block",border:"2px solid #0D0F1A",objectFit:"cover"}}/>
+            </div>
+            {thread.online&&<div style={{position:"absolute",bottom:1,right:1,width:11,height:11,borderRadius:"50%",background:"#0A9B6A",border:"2px solid #0D0F1A"}} className="pulse-dot"/>}
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <span style={{fontWeight:800,fontSize:16,color:"var(--text)",letterSpacing:"-.01em"}}>{thread.name}</span>
+              {thread.verified&&<span style={{fontSize:11,color:"#34D399"}}>✔</span>}
+            </div>
+            <div style={{fontSize:11,color:thread.online?"#34D399":"rgba(255,255,255,.35)",fontWeight:600}}>{thread.online?"● Active now":"Last seen recently"}</div>
+          </div>
+          {/* Action buttons */}
+          <div style={{display:"flex",gap:8}}>
+            {[
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.61 19a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 3.1 4.18 2 2 0 0 1 5.08 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L9.91 9a16 16 0 0 0 6 6l.41-.41a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>,
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="2" strokeLinecap="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            ].map((ic,i)=>(
+              <button key={i} style={{width:38,height:38,borderRadius:"50%",background:"#EEF2FF",border:"1px solid var(--b2)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>{ic}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div style={{flex:1,overflowY:"auto",padding:"16px 16px 8px",display:"flex",flexDirection:"column",gap:6,background:"var(--bg)"}}>
+        {msgs.map((m,i)=>{
+          const isMe=m.from==="me";
+          const showAvatar=!isMe&&(i===0||msgs[i-1]?.from==="me");
+          return (
+            <div key={m.id} style={{display:"flex",alignItems:"flex-end",gap:8,justifyContent:isMe?"flex-end":"flex-start",marginBottom:showAvatar?4:1}}>
+              {!isMe&&(
+                showAvatar
+                  ?<img src={thread.avatar} width={28} height={28} style={{borderRadius:"50%",flexShrink:0,border:"1.5px solid rgba(255,255,255,.1)",objectFit:"cover"}}/>
+                  :<div style={{width:28,flexShrink:0}}/>
+              )}
+              <div style={{maxWidth:"72%"}}>
+                <div style={{
+                  padding:"10px 14px",borderRadius:isMe?"18px 18px 4px 18px":"18px 18px 18px 4px",
+                  background:isMe?`linear-gradient(135deg,#1A4FD6,#7C3AED)`:"#fff",
+                  color:isMe?"#fff":"var(--text)",fontSize:13,lineHeight:1.55,
+                  border:isMe?"none":"1px solid var(--b1)",
+                  boxShadow:isMe?"0 4px 16px rgba(26,79,214,.35)":"none",
+                }}>
+                  {m.text}
+                </div>
+                <div style={{fontSize:10,color:"var(--muted)",marginTop:3,textAlign:isMe?"right":"left",paddingLeft:isMe?0:4,paddingRight:isMe?4:0}}>{m.time}</div>
+              </div>
+            </div>
+          );
+        })}
+        <div ref={endRef}/>
+      </div>
+
+      {/* Input bar */}
+      <div style={{flexShrink:0,padding:"10px 16px 32px",background:"rgba(255,255,255,.97)",backdropFilter:"blur(20px)",borderTop:"1px solid var(--b1)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,background:"#F4F7FD",borderRadius:50,padding:"8px 8px 8px 18px",border:"1.5px solid var(--b2)"}}>
+          <input
+            value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>e.key==="Enter"&&send()}
+            placeholder="Your Message..."
+            style={{flex:1,background:"none",border:"none",outline:"none",fontSize:13,color:"var(--text)",fontFamily:"inherit"}}
+          />
+          <button onClick={send} style={{width:38,height:38,borderRadius:"50%",background:input.trim()?"linear-gradient(135deg,#1A4FD6,#7C3AED)":"rgba(255,255,255,.08)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:input.trim()?"pointer":"default",transition:"all .2s",flexShrink:0,boxShadow:input.trim()?"0 4px 14px rgba(26,79,214,.4)":"none"}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9 22,2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Notifications Page ───────────────────────────────────────────────────────
+function NotificationsPage({onNav,user,notifs,notifCount,onMarkAllRead,onPost}) {
+  const NOTIF_ICONS={
+    "⚡":"linear-gradient(135deg,#F59E0B,#FBBF24)",
+    "🏆":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",
+    "💬":"linear-gradient(135deg,#1A4FD6,#7C3AED)",
+    "🔔":"linear-gradient(135deg,#7C3AED,#A78BFA)",
+    "🎯":"linear-gradient(135deg,#EF4444,#F87171)",
+    "🔥":"linear-gradient(135deg,#E85D20,#C2185B)",
+    "⚠️":"linear-gradient(135deg,#F59E0B,#EF4444)",
+    "🔼":"linear-gradient(135deg,#0A9B6A,#34D399)",
+    "💼":"linear-gradient(135deg,#0F1C3F,#1A4FD6)",
+    "🏅":"linear-gradient(135deg,#F59E0B,#FBBF24)",
+    "⬆️":"linear-gradient(135deg,#0A9B6A,#34D399)",
+  };
+  const groups=[
+    {label:"Today",   items:notifs.slice(0,3)},
+    {label:"Earlier", items:notifs.slice(3)},
+  ].filter(g=>g.items.length>0);
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",flexDirection:"column"}}>
+      {/* Header */}
+      <div style={{flexShrink:0,padding:"52px 18px 16px",position:"relative",overflow:"hidden"}}>
+
+        <div style={{position:"relative",zIndex:1,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div>
+            <div style={{fontSize:26,fontWeight:900,color:"var(--text)",letterSpacing:"-.03em"}}>Notifications</div>
+            <div style={{fontSize:12,color:"var(--muted)",marginTop:2}}>{notifCount>0?`${notifCount} unread`:"All caught up ✓"}</div>
+          </div>
+          <button onClick={onMarkAllRead} style={{padding:"8px 16px",borderRadius:50,background:"#EEF2FF",border:"1px solid var(--b2)",color:"var(--blue)",fontSize:11,fontWeight:700,cursor:"pointer"}}>
+            Mark all read
+          </button>
+        </div>
+      </div>
+
+      {/* Notification threads */}
+      <div style={{flex:1,overflowY:"auto",paddingBottom:90}}>
+        {/* NVIDIA Challenge Banner */}
+        <div style={{margin:"4px 14px 10px"}}>
+          <div style={{borderRadius:16,background:"linear-gradient(135deg,#0F1C3F,#1A4FD6)",padding:"16px",position:"relative",overflow:"hidden"}}>
+            <div style={{position:"absolute",right:-30,top:-30,width:130,height:130,borderRadius:"50%",background:"rgba(255,255,255,.05)"}}/>
+            <div style={{display:"flex",gap:12,alignItems:"center",position:"relative"}}>
+              <div style={{width:46,height:46,borderRadius:13,background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>⚡</div>
+              <div style={{flex:1}}><div style={{fontSize:13,fontWeight:800,color:"#FFFFFF",marginBottom:3,lineHeight:1.3}}>NVIDIA posted a ₹50,000 challenge — 12 days left</div><div style={{fontSize:11,color:"rgba(255,255,255,.65)"}}>Build an AI Study Scheduler. Winner gets internship track.</div></div>
+              <button onClick={()=>onNav("challenges")} style={{padding:"9px 14px",borderRadius:10,background:"#FFFFFF",color:"#1A4FD6",border:"none",fontWeight:800,fontSize:12,flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,.2)"}}>Enter →</button>
+            </div>
+          </div>
+        </div>
+        {/* Streak Card */}
+        <div style={{margin:"0 14px 10px"}}>
+          <div className="card" style={{padding:"13px 15px",display:"flex",gap:12,alignItems:"center",border:"1.5px solid rgba(224,87,32,.18)"}}>
+            <div style={{width:42,height:42,borderRadius:12,background:"linear-gradient(135deg,#E85D20,#C2185B)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0,boxShadow:"0 3px 10px rgba(232,93,32,.3)"}}>🔥</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:12,fontWeight:800,color:"var(--text)"}}>{user.streak}-Day Streak · Don't break it!</div>
+              <div style={{height:5,borderRadius:3,background:"rgba(232,93,32,.12)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:`${Math.min(100,(user.streak/100)*100)}%`,background:"linear-gradient(90deg,#E85D20,#1A4FD6)",borderRadius:3}}/></div>
+            </div>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:24,fontWeight:800,color:"#E85D20"}}>{user.streak}</div>
+          </div>
+        </div>
+        {groups.map(g=>(
+          <div key={g.label}>
+            <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",letterSpacing:".06em",textTransform:"uppercase",padding:"14px 18px 8px"}}>{g.label}</div>
+            {g.items.map(n=>{
+              const grad=NOTIF_ICONS[n.icon]||"linear-gradient(135deg,#1A4FD6,#7C3AED)";
+              return (
+                <div key={n.id} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 18px",borderBottom:"1px solid var(--b1)",background:n.read?"transparent":"#F5F0FF",transition:"background .15s",cursor:"pointer"}}
+                  onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.04)"}
+                  onMouseLeave={e=>e.currentTarget.style.background=n.read?"transparent":"rgba(124,58,237,.05)"}
+                >
+                  {/* Icon avatar */}
+                  <div style={{width:50,height:50,borderRadius:"50%",background:grad,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0,boxShadow:`0 4px 14px rgba(0,0,0,.3)`}}>
+                    {n.icon}
+                  </div>
+                  {/* Content */}
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,color:n.read?"var(--muted)":"var(--text)",lineHeight:1.5,fontWeight:n.read?400:600,marginBottom:3}}>{n.text}</div>
+                    <div style={{fontSize:11,color:"var(--muted)",fontWeight:500}}>{n.time}</div>
+                  </div>
+                  {/* Unread dot */}
+                  {!n.read&&<div style={{width:10,height:10,borderRadius:"50%",background:"#7C3AED",flexShrink:0,boxShadow:"0 0 6px rgba(124,58,237,.4)"}}/>}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+        {notifs.length===0&&(
+          <div style={{textAlign:"center",padding:"60px 20px",color:"var(--muted)"}}>
+            <div style={{fontSize:40,marginBottom:12}}>🔔</div>
+            <div style={{fontSize:14,fontWeight:600}}>No notifications yet</div>
+          </div>
+        )}
+      </div>
+      <BottomNav onNav={onNav} active="notifications" user={user} onPost={onPost}/>
+    </div>
+  );
+}
+
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
-function BottomNav({onNav,active,notifCount=0}) {
-  const tabs=[
-    {key:"feed",         label:"Home",       icon:on=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" stroke={on?"#1A4FD6":"#9AA8C5"}><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill={on?"#EBF0FF":"none"}/><polyline points="9,22 9,12 15,12 15,22"/></svg>},
-    {key:"challenges",   label:"Challenges", icon:on=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" stroke={on?"#1A4FD6":"#9AA8C5"}><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26 12,2" fill={on?"#EBF0FF":"none"}/></svg>},
-    {key:"opportunities",label:"Jobs",       icon:on=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" stroke={on?"#1A4FD6":"#9AA8C5"}><rect x="2" y="7" width="20" height="14" rx="2" fill={on?"#EBF0FF":"none"}/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>},
-    {key:"showcase",     label:"Showcase",   icon:on=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" stroke={on?"#1A4FD6":"#9AA8C5"}><rect x="3" y="3" width="18" height="18" rx="2" fill={on?"#EBF0FF":"none"}/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>},
-    {key:"profile",      label:"Me",         icon:on=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" stroke={on?"#1A4FD6":"#9AA8C5"}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" fill={on?"#EBF0FF":"none"}/><circle cx="12" cy="7" r="4" fill={on?"#EBF0FF":"none"}/></svg>},
+// ─── CreatePost ───────────────────────────────────────────────────────────────
+function CreatePost({user,onClose,onSubmit}) {
+  const [step,setStep]=useState("type"); // type → compose → done
+  const [postType,setPostType]=useState(null);
+  const [text,setText]=useState("");
+  const [hashtags,setHashtags]=useState("");
+  const [taggedUsers,setTaggedUsers]=useState([]);
+  const [collab,setCollab]=useState(false);
+  const [imagePreview,setImagePreview]=useState(null);
+  const [posting,setPosting]=useState(false);
+
+  const POST_TYPES=[
+    {id:"content",    emoji:"📝", label:"Share Knowledge",   desc:"Notes, concepts, tips"},
+    {id:"image",      emoji:"🖼️", label:"Post Image",        desc:"Study photo, diagram, meme"},
+    {id:"hashtag",    emoji:"#",  label:"Trending Topic",    desc:"Join a study thread"},
+    {id:"collab",     emoji:"🤝", label:"Find Collaborator", desc:"Team up for challenges"},
+    {id:"opportunity",emoji:"💼", label:"Opportunity",       desc:"Share a job / internship"},
+    {id:"asking",     emoji:"❓", label:"Ask the Community", desc:"Get answers fast"},
+  ];
+
+  const SUGGEST_TAGS=["#NEET2026","#JEE2026","#Physics","#Chemistry","#Biology","#Maths","#AIIMS","#IIT","#StudyTips","#MockTest","#Motivation","#DailyStreak"];
+
+  const handlePost=()=>{
+    if(!text.trim()) return;
+    setPosting(true);
+    setTimeout(()=>{
+      onSubmit&&onSubmit({type:postType,text,hashtags,taggedUsers,collab});
+      setPosting(false);
+      onClose();
+    },800);
+  };
+
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:300,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+      {/* backdrop */}
+      <div style={{position:"absolute",inset:0,background:"rgba(15,28,63,.45)",backdropFilter:"blur(4px)"}} onClick={onClose}/>
+
+      <div style={{position:"relative",background:"#fff",borderRadius:"22px 22px 0 0",maxHeight:"92vh",display:"flex",flexDirection:"column",overflow:"hidden",boxShadow:"0 -8px 40px rgba(15,28,63,.18)"}}>
+        {/* Handle bar */}
+        <div style={{display:"flex",justifyContent:"center",padding:"10px 0 0"}}>
+          <div style={{width:36,height:4,borderRadius:2,background:"#E0E6F0"}}/>
+        </div>
+
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 18px 12px",borderBottom:"1px solid #F0F4FA"}}>
+          {step==="compose"
+            ?<button onClick={()=>setStep("type")} style={{background:"none",border:"none",color:"var(--blue)",fontWeight:700,fontSize:14,cursor:"pointer"}}>← Back</button>
+            :<div style={{width:40}}/>}
+          <div style={{fontWeight:800,fontSize:15,color:"var(--text)"}}>
+            {step==="type"?"Create Post":"Compose"}
+          </div>
+          <button onClick={onClose} style={{width:30,height:30,borderRadius:"50%",background:"#F0F4FA",border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:16,color:"#666"}}>✕</button>
+        </div>
+
+        {/* Step 1: Pick type */}
+        {step==="type"&&(
+          <div style={{overflowY:"auto",padding:"14px 16px 30px"}}>
+            <div style={{fontSize:12,color:"var(--muted)",marginBottom:12,fontWeight:600}}>What do you want to share?</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              {POST_TYPES.map(t=>(
+                <button key={t.id} onClick={()=>{setPostType(t.id);setStep("compose");}} style={{display:"flex",alignItems:"center",gap:10,padding:"14px 12px",borderRadius:14,border:"1.5px solid #E8ECF2",background:"#FAFBFD",cursor:"pointer",textAlign:"left",transition:"all .15s"}}>
+                  <div style={{width:38,height:38,borderRadius:11,background:"linear-gradient(135deg,#EBF0FF,#F0F4FF)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>{t.emoji}</div>
+                  <div>
+                    <div style={{fontWeight:700,fontSize:12,color:"var(--text)"}}>{t.label}</div>
+                    <div style={{fontSize:10,color:"var(--muted)",marginTop:1}}>{t.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Compose */}
+        {step==="compose"&&(
+          <div style={{display:"flex",flexDirection:"column",flex:1,overflow:"hidden"}}>
+            <div style={{overflowY:"auto",flex:1,padding:"14px 16px"}}>
+              {/* User row */}
+              <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:14}}>
+                <img src={user.avatar} width={40} height={40} style={{borderRadius:"50%",border:"2px solid #E8ECF2"}}/>
+                <div>
+                  <div style={{fontWeight:700,fontSize:13,color:"var(--text)"}}>{user.name}</div>
+                  <div style={{display:"flex",gap:5,marginTop:3}}>
+                    <span style={{fontSize:10,background:"#EBF0FF",color:"var(--blue)",borderRadius:50,padding:"2px 8px",fontWeight:600}}>🌐 Anyone</span>
+                    {collab&&<span style={{fontSize:10,background:"#E6FAF2",color:"#0A9B6A",borderRadius:50,padding:"2px 8px",fontWeight:600}}>🤝 Collab</span>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Text area */}
+              <textarea
+                placeholder={
+                  postType==="asking"?"Ask your question... (be specific for faster answers)":
+                  postType==="collab"?"Describe what you're working on and what help you need...":
+                  postType==="opportunity"?"Share the opportunity details — role, company, stipend, deadline...":
+                  postType==="hashtag"?"What's trending in your study community?":
+                  "Share your knowledge, notes, or thoughts..."
+                }
+                value={text}
+                onChange={e=>setText(e.target.value)}
+                style={{width:"100%",minHeight:120,border:"none",outline:"none",fontSize:14,lineHeight:1.7,color:"#1A1A2E",resize:"none",fontFamily:"inherit",background:"transparent",boxSizing:"border-box"}}
+              />
+
+              {/* Image preview */}
+              {imagePreview&&(
+                <div style={{position:"relative",marginTop:10}}>
+                  <img src={imagePreview} style={{width:"100%",borderRadius:12,maxHeight:200,objectFit:"cover"}}/>
+                  <button onClick={()=>setImagePreview(null)} style={{position:"absolute",top:8,right:8,width:26,height:26,borderRadius:"50%",background:"rgba(0,0,0,.5)",border:"none",color:"#fff",cursor:"pointer",fontSize:14}}>✕</button>
+                </div>
+              )}
+
+              {/* Hashtag suggestions */}
+              <div style={{marginTop:12}}>
+                <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",marginBottom:6}}>Suggested hashtags</div>
+                <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+                  {SUGGEST_TAGS.map(t=>(
+                    <button key={t} onClick={()=>setHashtags(h=>h.includes(t)?h:h+" "+t)} style={{fontSize:10,fontWeight:600,color:hashtags.includes(t)?"var(--blue)":"var(--muted)",background:hashtags.includes(t)?"#EBF0FF":"#F4F7FD",border:`1px solid ${hashtags.includes(t)?"rgba(26,79,214,.2)":"transparent"}`,borderRadius:50,padding:"4px 10px",cursor:"pointer"}}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tag users */}
+              <div style={{marginTop:14,borderTop:"1px solid #F0F4FA",paddingTop:12}}>
+                <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",marginBottom:8}}>Tag students</div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  {STUDENTS.filter(s=>s.id!==user.id).slice(0,8).map(s=>(
+                    <button key={s.id} onClick={()=>setTaggedUsers(u=>u.includes(s.id)?u.filter(x=>x!==s.id):[...u,s.id])} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",borderRadius:50,border:`1.5px solid ${taggedUsers.includes(s.id)?"var(--blue)":"#E8ECF2"}`,background:taggedUsers.includes(s.id)?"#EBF0FF":"#FAFBFD",cursor:"pointer"}}>
+                      <img src={s.avatar} width={16} height={16} style={{borderRadius:"50%"}}/>
+                      <span style={{fontSize:11,fontWeight:600,color:taggedUsers.includes(s.id)?"var(--blue)":"var(--sub)"}}>{s.name.split(" ")[0]}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom toolbar */}
+            <div style={{borderTop:"1px solid #F0F4FA",padding:"10px 16px",background:"#fff"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
+                <button style={{background:"none",border:"none",display:"flex",alignItems:"center",gap:5,color:"var(--muted)",fontSize:12,fontWeight:600,cursor:"pointer",padding:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+                  Photo
+                </button>
+                <button onClick={()=>setCollab(c=>!c)} style={{background:"none",border:"none",display:"flex",alignItems:"center",gap:5,color:collab?"var(--blue)":"var(--muted)",fontSize:12,fontWeight:600,cursor:"pointer",padding:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Collab
+                </button>
+                <button style={{background:"none",border:"none",display:"flex",alignItems:"center",gap:5,color:"var(--muted)",fontSize:12,fontWeight:600,cursor:"pointer",padding:0}}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                  Invite
+                </button>
+              </div>
+              <button onClick={handlePost} disabled={!text.trim()||posting} style={{width:"100%",padding:"13px",borderRadius:14,background:text.trim()?"linear-gradient(135deg,#1A4FD6,#3B5CE8)":"#E8ECF2",border:"none",color:text.trim()?"#fff":"#aaa",fontWeight:800,fontSize:14,cursor:text.trim()?"pointer":"default",transition:"all .2s"}}>
+                {posting?"Posting...":"Post"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// ─── Toast Notifications ──────────────────────────────────────────────────────
+// Global toast bus — fires events without touching App state
+const toastBus={_cbs:[],emit(t){this._cbs.forEach(cb=>cb(t));},on(cb){this._cbs.push(cb);return()=>{this._cbs=this._cbs.filter(x=>x!==cb);};} };
+
+function ToastStack() {
+  const [toasts,setToasts]=useState([]);
+  useEffect(()=>toastBus.on(toast=>{
+    const id=Date.now()+Math.random();
+    setToasts(prev=>[...prev,{...toast,id}]);
+    setTimeout(()=>setToasts(prev=>prev.filter(x=>x.id!==id)),5000);
+  }),[]);
+  const ICONS={
+    "🔥":"linear-gradient(135deg,#E85D20,#C2185B)",
+    "⚠️":"linear-gradient(135deg,#F59E0B,#EF4444)",
+    "💬":"linear-gradient(135deg,#1A4FD6,#7C3AED)",
+    "⚡":"linear-gradient(135deg,#F59E0B,#FBBF24)",
+    "🏆":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",
+  };
+  if(!toasts.length) return null;
+  return (
+    <div style={{position:"fixed",top:56,left:0,right:0,zIndex:99999,display:"flex",flexDirection:"column",alignItems:"center",gap:8,padding:"0 12px",pointerEvents:"none"}}>
+      {toasts.map(toast=>(
+        <div key={toast.id} style={{width:"100%",maxWidth:400,background:"#1A1A2E",borderRadius:16,padding:"12px 14px",display:"flex",alignItems:"center",gap:12,boxShadow:"0 8px 32px rgba(0,0,0,.4)",border:"1px solid rgba(255,255,255,.1)",pointerEvents:"auto",animation:"slideDown .3s ease"}}>
+          <div style={{width:38,height:38,borderRadius:12,background:ICONS[toast.icon]||"linear-gradient(135deg,#1A4FD6,#7C3AED)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>
+            {toast.icon}
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:12,color:"#fff",lineHeight:1.45,fontWeight:500}}>{toast.text}</div>
+          </div>
+          <button onClick={()=>setToasts(prev=>prev.filter(x=>x.id!==toast.id))} style={{background:"none",border:"none",color:"rgba(255,255,255,.4)",fontSize:16,cursor:"pointer",flexShrink:0,padding:"0 4px",lineHeight:1}}>✕</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BottomNav({onNav,active,notifCount=0,user,onPost}) {
+  const left=[
+    {key:"feed",    label:"Home",   icon:on=><svg width="22" height="22" viewBox="0 0 24 24" fill={on?"#1A4FD6":"none"} stroke={on?"#1A4FD6":"#9AA8C5"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>},
+    {key:"battle",  label:"Battle", icon:on=><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={on?"#7C3AED":"#9AA8C5"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>},
+  ];
+  const right=[
+    {key:"discover",      label:"Discover", icon:on=><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={on?"#1A4FD6":"#9AA8C5"} strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88 16.24,7.76"/></svg>},
+    {key:"profile",       label:"Me",       icon:null},
   ];
   return (
-    <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:100,background:"rgba(255,255,255,.97)",backdropFilter:"blur(12px)",borderTop:"1px solid var(--b1)",display:"flex"}}>
-      {tabs.map(t=>{
+    <div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:100,background:"rgba(255,255,255,.97)",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(0,0,0,.07)",display:"flex",alignItems:"center",paddingBottom:"env(safe-area-inset-bottom,8px)"}}>
+      {left.map(t=>{
         const on=active===t.key;
         return (
-          <button key={t.key} onClick={()=>onNav(t.key)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:3,padding:"9px 0 13px",background:"none",border:"none",position:"relative"}}>
-            {on&&<div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:22,height:2,background:"linear-gradient(90deg,#1A4FD6,#3B5CE8)",borderRadius:"0 0 3px 3px"}}/>}
-            <div style={{width:38,height:27,borderRadius:9,background:on?"#EBF0FF":"transparent",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-              {t.icon(on)}
-              {t.key==="challenges"&&<span style={{position:"absolute",top:-3,right:-3,width:14,height:14,background:"#1A4FD6",borderRadius:"50%",border:"2px solid white",fontSize:7,color:"white",fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>{CHALLENGES.length}</span>}
-              {t.key==="feed"&&notifCount>0&&<span style={{position:"absolute",top:1,right:1,width:9,height:9,background:"#EF4444",borderRadius:"50%",border:"1.5px solid var(--bg)"}}/>}
-            </div>
-            <span style={{fontSize:8,fontWeight:on?700:500,color:on?"#1A4FD6":"var(--muted)"}}>{t.label}</span>
+          <button key={t.key} onClick={()=>onNav(t.key)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,padding:"10px 0 12px",background:"none",border:"none",cursor:"pointer"}}>
+            {t.icon(on)}
+            <span style={{fontSize:10,fontWeight:on?700:500,color:on?"#1A4FD6":"#9AA8C5"}}>{t.label}</span>
+          </button>
+        );
+      })}
+      <div style={{flex:1,display:"flex",justifyContent:"center",alignItems:"center",paddingBottom:6}}>
+        <button onClick={onPost} style={{width:56,height:56,borderRadius:"50%",background:"linear-gradient(135deg,#1A4FD6,#3B5CE8)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 6px 24px rgba(26,79,214,.5)",cursor:"pointer",transform:"translateY(-12px)"}}>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+        </button>
+      </div>
+      {right.map(t=>{
+        const on=active===t.key;
+        return (
+          <button key={t.key} onClick={()=>onNav(t.key)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,padding:"10px 0 12px",background:"none",border:"none",cursor:"pointer"}}>
+            {t.key==="profile"&&user?.avatar
+              ?<img src={user.avatar} width={26} height={26} style={{borderRadius:"50%",border:on?"2.5px solid #1A4FD6":"2px solid #E0E6F0",display:"block"}}/>
+              :t.icon(on)
+            }
+            <span style={{fontSize:10,fontWeight:on?700:500,color:on?"#1A4FD6":"#9AA8C5"}}>{t.label}</span>
           </button>
         );
       })}
@@ -692,7 +1334,259 @@ function ChallengeDetail({c,onBack,user,submissions,onVoteSubmission,onCommentSu
 }
 
 // ─── Challenges Screen ────────────────────────────────────────────────────────
-function Challenges({onNav,onOpenChallenge,user,notifs,onMarkAllRead}) {
+// ─── Daily Battle ─────────────────────────────────────────────────────────────
+function DailyBattle({onNav,user,onPost}) {
+  const [answered,setAnswered]=useState(null);
+  const [showInsight,setShowInsight]=useState(false);
+  const [tab,setTab]=useState("question");
+  const [timeLeft,setTimeLeft]=useState("");
+  const [qIndex,setQIndex]=useState(0);
+  const [allAnswers,setAllAnswers]=useState({}); // {qIndex: answerIndex}
+  const q=DAILY_QUESTIONS[qIndex]||DAILY_QUESTIONS[0];
+
+  const goNext=()=>{
+    const next=qIndex+1;
+    if(next<DAILY_QUESTIONS.length){
+      setQIndex(next);
+      setAnswered(allAnswers[next]??null);
+      setShowInsight(allAnswers[next]!=null);
+    }
+  };
+  const goPrev=()=>{
+    const prev=qIndex-1;
+    if(prev>=0){
+      setQIndex(prev);
+      setAnswered(allAnswers[prev]??null);
+      setShowInsight(allAnswers[prev]!=null);
+    }
+  };
+
+  // Countdown to next 30-min mark
+  useEffect(()=>{
+    const tick=()=>{
+      const now=new Date();
+      const next=new Date(now);
+      next.setMinutes(now.getMinutes()<30?30:60,0,0);
+      const diff=next-now;
+      const m=Math.floor(diff/60000);
+      const s=Math.floor((diff%60000)/1000);
+      setTimeLeft(`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`);
+    };
+    tick();
+    const iv=setInterval(tick,1000);
+    return()=>clearInterval(iv);
+  },[]);
+
+  const insight=answered!==null?q.insights[answered]:null;
+  const totalAnswered=q.participants+(answered!==null?1:0);
+
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",flexDirection:"column"}}>
+      {/* Header */}
+      <div style={{background:"rgba(255,255,255,.97)",padding:"52px 16px 0",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)",borderBottom:"1px solid var(--b1)"}}>
+        <div style={{maxWidth:600,margin:"0 auto"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+            <div>
+              <div style={{fontSize:20,fontWeight:900,color:"var(--text)",letterSpacing:"-.03em"}}>⚔️ Daily Battle</div>
+              <div style={{fontSize:11,color:"var(--muted)",marginTop:1}}>One question. Everyone answers. Know your brain.</div>
+            </div>
+            <div style={{background:"#0A0A0F",borderRadius:10,padding:"6px 12px",textAlign:"center"}}>
+              <div style={{fontSize:9,color:"rgba(255,255,255,.4)",fontWeight:700,letterSpacing:".06em"}}>RESETS IN</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:15,fontWeight:800,color:"#FFD580"}}>{timeLeft}</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:0,borderBottom:"2px solid var(--b1)"}}>
+            {[["question","🧠 Today"],["leaderboard","🏆 Leaderboard"],["history","📅 History"]].map(([k,l])=>(
+              <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"8px 0",background:"none",border:"none",borderBottom:tab===k?"2px solid #7C3AED":"2px solid transparent",marginBottom:-2,color:tab===k?"#7C3AED":"var(--muted)",fontWeight:tab===k?700:500,fontSize:11,cursor:"pointer"}}>{l}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{flex:1,overflowY:"auto",paddingBottom:90}}>
+        <div style={{maxWidth:600,margin:"0 auto",padding:"16px 14px"}}>
+
+          {/* ── QUESTION TAB ── */}
+          {tab==="question"&&(
+            <div>
+              {/* Participants pill */}
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
+                <div style={{display:"flex"}}>{BATTLE_LEADERBOARD.slice(0,4).map((p,i)=><img key={i} src={p.avatar} width={22} height={22} style={{borderRadius:"50%",border:"2px solid var(--bg)",marginLeft:i?-8:0,display:"block"}}/>)}</div>
+                <span style={{fontSize:11,color:"var(--muted)",fontWeight:600}}>{totalAnswered.toLocaleString()} answered</span>
+                <span style={{marginLeft:"auto",fontSize:11,fontWeight:800,color:"#7C3AED",background:"rgba(124,58,237,.1)",padding:"3px 10px",borderRadius:50,border:"1px solid rgba(124,58,237,.2)"}}>{qIndex+1} / {DAILY_QUESTIONS.length}</span>
+              </div>
+              {/* Progress bar */}
+              <div style={{height:4,borderRadius:2,background:"var(--b1)",marginBottom:14,overflow:"hidden"}}>
+                <div style={{height:"100%",width:`${((Object.keys(allAnswers).length)/DAILY_QUESTIONS.length)*100}%`,background:"linear-gradient(90deg,#7C3AED,#1A4FD6)",borderRadius:2,transition:"width .4s ease"}}/>
+              </div>
+
+              {/* Question card */}
+              <div style={{borderRadius:20,background:"linear-gradient(135deg,#0A0A0F,#1A0A2E)",padding:"24px 20px",marginBottom:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-40,right:-40,width:140,height:140,borderRadius:"50%",background:"rgba(124,58,237,.15)",filter:"blur(30px)"}}/>
+                <div style={{position:"absolute",bottom:-30,left:-20,width:100,height:100,borderRadius:"50%",background:"rgba(26,79,214,.1)",filter:"blur(20px)"}}/>
+                <div style={{position:"relative"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                    <div style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.35)",letterSpacing:".08em"}}>TODAY'S QUESTION</div>
+                    <span style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,.5)",background:"rgba(255,255,255,.08)",padding:"3px 10px",borderRadius:50}}>{q.category}</span>
+                  </div>
+                  <div style={{fontSize:17,fontWeight:800,color:"#fff",lineHeight:1.45,letterSpacing:"-.01em"}}>{q.question}</div>
+                </div>
+              </div>
+
+              {/* Options */}
+              {!showInsight&&(
+                <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
+                  {q.options.map((opt,i)=>{
+                    const isChosen=answered===i;
+                    return (
+                      <button key={i} onClick={()=>{if(answered===null){setAnswered(i);setAllAnswers(a=>({...a,[qIndex]:i}));setTimeout(()=>setShowInsight(true),600);}}}
+                        style={{padding:"14px 16px",borderRadius:14,background:isChosen?"linear-gradient(135deg,#7C3AED,#1A4FD6)":answered!==null?"rgba(15,28,63,.04)":"#fff",border:isChosen?"none":(answered!==null?"1.5px solid var(--b1)":"1.5px solid var(--b2)"),textAlign:"left",fontSize:13,fontWeight:isChosen?700:500,color:isChosen?"#fff":answered!==null?"var(--muted)":"var(--text)",cursor:answered===null?"pointer":"default",transition:"all .2s",boxShadow:isChosen?"0 4px 20px rgba(124,58,237,.4)":"0 1px 4px rgba(15,28,63,.06)",display:"flex",alignItems:"center",gap:10}}>
+                        <span style={{width:24,height:24,borderRadius:"50%",background:isChosen?"rgba(255,255,255,.2)":answered!==null?"rgba(15,28,63,.06)":"#EEF2FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:isChosen?"#fff":"var(--blue)",flexShrink:0}}>{String.fromCharCode(65+i)}</span>
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Insight reveal */}
+              {showInsight&&insight&&(
+                <div style={{animation:"slideDown .4s ease"}}>
+                  {/* Chosen answer */}
+                  <div style={{padding:"12px 16px",borderRadius:14,background:"linear-gradient(135deg,#7C3AED,#1A4FD6)",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
+                    <span style={{fontSize:20}}>{insight.emoji}</span>
+                    <div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)",fontWeight:600}}>You answered</div>
+                      <div style={{fontSize:13,fontWeight:800,color:"#fff"}}>{q.options[answered]}</div>
+                    </div>
+                  </div>
+
+                  {/* Brain insight card */}
+                  <div style={{borderRadius:20,background:"#fff",border:"1px solid var(--b1)",overflow:"hidden",marginBottom:14,boxShadow:"0 2px 12px rgba(15,28,63,.08)"}}>
+                    <div style={{background:`linear-gradient(135deg,${insight.color}22,${insight.color}11)`,padding:"16px 18px",borderBottom:"1px solid var(--b1)"}}>
+                      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
+                        <div style={{width:38,height:38,borderRadius:12,background:insight.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20}}>{insight.emoji}</div>
+                        <div>
+                          <div style={{fontSize:10,color:"var(--muted)",fontWeight:700,letterSpacing:".06em"}}>YOUR BRAIN TYPE</div>
+                          <div style={{fontSize:16,fontWeight:900,color:"var(--text)"}}>{insight.title}</div>
+                        </div>
+                        <div style={{marginLeft:"auto",fontSize:11,fontWeight:700,color:"var(--blue)",background:"#EEF2FF",padding:"4px 10px",borderRadius:50}}>+{q.xp} XP</div>
+                      </div>
+                    </div>
+                    <div style={{padding:"16px 18px"}}>
+                      <div style={{fontSize:13,color:"var(--text)",lineHeight:1.65,marginBottom:14}}>{insight.insight}</div>
+                      <div style={{background:"#F5F3FF",borderRadius:12,padding:"12px 14px",borderLeft:`3px solid ${insight.color}`}}>
+                        <div style={{fontSize:10,fontWeight:800,color:"#7C3AED",letterSpacing:".06em",marginBottom:4}}>💡 IMPROVEMENT TIP</div>
+                        <div style={{fontSize:12,color:"var(--text)",lineHeight:1.6}}>{insight.tip}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress + Navigation */}
+                  <div style={{marginTop:4}}>
+                    {/* Progress dots */}
+                    <div style={{display:"flex",justifyContent:"center",gap:6,marginBottom:14}}>
+                      {DAILY_QUESTIONS.map((_,i)=>(
+                        <div key={i} onClick={()=>{setQIndex(i);setAnswered(allAnswers[i]??null);setShowInsight(allAnswers[i]!=null);}}
+                          style={{width:i===qIndex?22:8,height:8,borderRadius:4,background:allAnswers[i]!=null?"#7C3AED":i===qIndex?"#1A4FD6":"var(--b2)",transition:"all .3s",cursor:"pointer"}}/>
+                      ))}
+                    </div>
+                    {/* Nav buttons */}
+                    <div style={{display:"flex",gap:8}}>
+                      {qIndex>0&&(
+                        <button onClick={goPrev} style={{flex:1,padding:"12px",borderRadius:12,background:"#fff",border:"1.5px solid var(--b2)",color:"var(--sub)",fontWeight:700,fontSize:13,cursor:"pointer"}}>← Previous</button>
+                      )}
+                      {qIndex<DAILY_QUESTIONS.length-1?(
+                        <button onClick={goNext} style={{flex:2,padding:"12px",borderRadius:12,background:"linear-gradient(135deg,#7C3AED,#1A4FD6)",border:"none",color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",boxShadow:"0 4px 16px rgba(124,58,237,.35)"}}>
+                          Next Question ⚔️
+                        </button>
+                      ):(
+                        <button onClick={()=>setTab("leaderboard")} style={{flex:2,padding:"12px",borderRadius:12,background:"linear-gradient(135deg,#F59E0B,#E85D20)",border:"none",color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",boxShadow:"0 4px 16px rgba(245,158,11,.35)"}}>
+                          See Leaderboard 🏆
+                        </button>
+                      )}
+                    </div>
+                    <div style={{textAlign:"center",marginTop:10,fontSize:11,color:"var(--muted)"}}>
+                      {Object.keys(allAnswers).length} of {DAILY_QUESTIONS.length} completed · +{Object.keys(allAnswers).length*50} XP earned
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {answered===null&&(
+                <div style={{textAlign:"center",padding:"8px 0 4px"}}>
+                  <div style={{fontSize:11,color:"var(--muted)"}}>✨ Answer to reveal your brain insight + earn {q.xp} XP</div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── LEADERBOARD TAB ── */}
+          {tab==="leaderboard"&&(
+            <div>
+              <div style={{borderRadius:18,background:"linear-gradient(135deg,#0A0A0F,#1A0A2E)",padding:"16px",marginBottom:16,textAlign:"center"}}>
+                <div style={{fontSize:11,color:"rgba(255,255,255,.4)",fontWeight:700,letterSpacing:".08em",marginBottom:6}}>BATTLE STREAK LEADERS</div>
+                <div style={{fontSize:13,color:"rgba(255,255,255,.6)"}}>Most consecutive days answered</div>
+              </div>
+              {BATTLE_LEADERBOARD.map((p,i)=>{
+                const isMe=p.name===user.name;
+                return (
+                  <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:14,background:isMe?"linear-gradient(135deg,rgba(124,58,237,.08),rgba(26,79,214,.08))":"#fff",border:isMe?"1.5px solid rgba(124,58,237,.25)":"1px solid var(--b1)",marginBottom:8,boxShadow:"0 1px 6px rgba(15,28,63,.05)"}}>
+                    <div style={{width:28,textAlign:"center",fontFamily:"'JetBrains Mono',monospace",fontWeight:900,fontSize:15,color:i<3?"#F59E0B":"var(--muted)"}}>{p.badge||`#${p.rank}`}</div>
+                    <img src={p.avatar} width={38} height={38} style={{borderRadius:"50%",border:`2px solid ${isMe?"#7C3AED":"var(--b1)"}`}}/>
+                    <div style={{flex:1}}>
+                      <div style={{fontWeight:700,fontSize:13,color:"var(--text)"}}>{p.name}{isMe&&<span style={{fontSize:10,color:"#7C3AED",fontWeight:800,marginLeft:6}}>YOU</span>}</div>
+                      <div style={{fontSize:11,color:"var(--muted)",marginTop:1}}>🔥 {p.streak}-day streak</div>
+                    </div>
+                    <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:800,fontSize:14,color:"#7C3AED"}}>+{p.xp}</div>
+                  </div>
+                );
+              })}
+              {answered===null&&(
+                <div style={{textAlign:"center",padding:"16px",borderRadius:14,background:"#F5F3FF",border:"1.5px dashed rgba(124,58,237,.3)",marginTop:8}}>
+                  <div style={{fontSize:13,fontWeight:700,color:"#7C3AED",marginBottom:4}}>Answer today's question to join the leaderboard!</div>
+                  <button onClick={()=>setTab("question")} style={{background:"linear-gradient(135deg,#7C3AED,#1A4FD6)",border:"none",borderRadius:50,padding:"8px 20px",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>Answer Now →</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── HISTORY TAB ── */}
+          {tab==="history"&&(
+            <div>
+              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:16,padding:"12px 14px",borderRadius:14,background:"linear-gradient(135deg,rgba(124,58,237,.08),rgba(26,79,214,.08))",border:"1px solid rgba(124,58,237,.15)"}}>
+                <span style={{fontSize:22}}>🔥</span>
+                <div>
+                  <div style={{fontWeight:800,fontSize:14,color:"var(--text)"}}>Your Battle Streak: {answered!==null?1:0} day{answered!==null?"":"s"}</div>
+                  <div style={{fontSize:11,color:"var(--muted)",marginTop:1}}>Answer every day to build your streak</div>
+                </div>
+              </div>
+              {DAILY_QUESTIONS.map((q,i)=>(
+                <div key={q.id} style={{borderRadius:16,background:"#fff",border:"1px solid var(--b1)",padding:"14px 16px",marginBottom:10,boxShadow:"0 1px 6px rgba(15,28,63,.05)"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                    <span style={{fontSize:10,fontWeight:700,color:"var(--muted)",letterSpacing:".04em"}}>{q.date}</span>
+                    <span style={{fontSize:10,fontWeight:700,color:"#7C3AED",background:"rgba(124,58,237,.1)",padding:"2px 8px",borderRadius:50}}>{q.category}</span>
+                  </div>
+                  <div style={{fontSize:13,fontWeight:600,color:"var(--text)",lineHeight:1.45,marginBottom:8}}>{q.question}</div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                    <span style={{fontSize:11,color:"var(--muted)"}}>{q.participants.toLocaleString()} answers</span>
+                    {i===0?
+                      <span style={{fontSize:11,fontWeight:700,color:answered!==null?"#0A9B6A":"#F59E0B"}}>{answered!==null?"✓ Answered":"Pending"}</span>
+                      :<span style={{fontSize:11,fontWeight:700,color:"#0A9B6A"}}>✓ Answered</span>
+                    }
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <BottomNav onNav={onNav} active="battle" user={user} onPost={onPost}/>
+    </div>
+  );
+}
+
+function Challenges({onNav,onOpenChallenge,user,notifs,onMarkAllRead,onPost}) {
   const [filter,setFilter]=useState("all");
   const [catFilter,setCatFilter]=useState("all");
   const [showNotifs,setShowNotifs]=useState(false);
@@ -704,8 +1598,6 @@ function Challenges({onNav,onOpenChallenge,user,notifs,onMarkAllRead}) {
   });
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      {showNotifs&&<NotifPanel notifs={notifs} onClose={()=>setShowNotifs(false)} onMarkAllRead={()=>{onMarkAllRead();setShowNotifs(false);}}/>}
-      <CompanyTicker/>
       <div style={{background:"rgba(255,255,255,.97)",padding:"12px 15px",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)",borderBottom:"1px solid var(--b1)"}}>
         <div style={{maxWidth:600,margin:"0 auto"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
@@ -740,18 +1632,17 @@ function Challenges({onNav,onOpenChallenge,user,notifs,onMarkAllRead}) {
         </div>
         {filtered.map(c=><ChallengeCard key={c.id} c={c} onClick={()=>onOpenChallenge(c)}/>)}
       </div>
-      <BottomNav onNav={onNav} active="challenges" notifCount={unread}/>
+      <BottomNav onNav={onNav} active="challenges" notifCount={unread} user={user} onPost={onPost} />
     </div>
   );
 }
 
 // ─── Showcase ─────────────────────────────────────────────────────────────────
-function Showcase({onNav,submissions,user,onVoteSubmission,onCommentSubmission}) {
+function Showcase({onNav,submissions,user,onVoteSubmission,onCommentSubmission,onPost}) {
   const [cf,setCf]=useState("all");
   const filtered=cf==="all"?submissions:submissions.filter(s=>s.challengeId===parseInt(cf));
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      <CompanyTicker/>
       <div style={{background:"rgba(255,255,255,.97)",padding:"12px 15px",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)",borderBottom:"1px solid var(--b1)"}}>
         <div style={{maxWidth:600,margin:"0 auto"}}>
           <div style={{fontWeight:800,fontSize:14,color:"var(--text)",marginBottom:3}}>Challenge Showcase 🌐</div>
@@ -771,7 +1662,7 @@ function Showcase({onNav,submissions,user,onVoteSubmission,onCommentSubmission})
         </div>
         {filtered.map(sub=><SubmissionCard key={sub.id} sub={sub} currentUserId={user.id} onVote={onVoteSubmission} onComment={onCommentSubmission}/>)}
       </div>
-      <BottomNav onNav={onNav} active="showcase"/>
+      <BottomNav onNav={onNav} active="discover" user={user} onPost={onPost} />
     </div>
   );
 }
@@ -832,11 +1723,10 @@ function ChallengePortfolio({onBack,user,history}) {
 }
 
 // ─── Opportunities ────────────────────────────────────────────────────────────
-function Opportunities({onNav,user}) {
+function Opportunities({onNav,user,onPost}) {
   const [applied,setApplied]=useState([]);
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      <CompanyTicker/>
       <div style={{background:"rgba(255,255,255,.97)",padding:"12px 15px",borderBottom:"1px solid var(--b1)",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)"}}>
         <div style={{maxWidth:600,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div><div style={{fontWeight:800,fontSize:14,color:"var(--text)"}}>Opportunities 💼</div><div style={{fontSize:10,color:"var(--muted)"}}>Apply with your profile · No CV needed</div></div>
@@ -866,83 +1756,407 @@ function Opportunities({onNav,user}) {
                 <span style={{fontSize:10,color:"var(--muted)",marginLeft:"auto"}}>{o.stipend} · {o.duration}</span>
               </div>
               <button onClick={()=>setApplied(p=>p.includes(o.id)?p.filter(x=>x!==o.id):[...p,o.id])} style={{width:"100%",padding:"10px",borderRadius:10,background:isApplied?"#EDFAF3":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",color:isApplied?"#0A9B6A":"#FFFFFF",border:isApplied?"1px solid rgba(10,155,106,.3)":"none",fontWeight:800,fontSize:13,display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-                {isApplied?"✔ Applied · Profile Sent":"Apply with LearnLoop Profile →"}
+                {isApplied?"✔ Applied · Profile Sent":"Apply with Infinity Profile →"}
               </button>
             </div>
           );
         })}
       </div>
-      <BottomNav onNav={onNav} active="opportunities"/>
+      <BottomNav onNav={onNav} active="discover" user={user} onPost={onPost} />
     </div>
   );
 }
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
-function Profile({onNav,user,history}) {
-  const [tab,setTab]=useState("overview");
+// ─── Discover (Opportunities + Showcase merged) ───────────────────────────────
+function Discover({onNav,user,submissions,onVoteSubmission,onCommentSubmission,onViewProfile,followed,onFollow,onPost}) {
+  const [tab,setTab]=useState("showcase");
+  const [applied,setApplied]=useState([]);
+  const [cf,setCf]=useState("all");
+  const filtered=cf==="all"?submissions:submissions.filter(s=>s.challengeId===parseInt(cf));
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      <div style={{position:"relative",background:"linear-gradient(135deg,#0F1C3F 0%,#1A4FD6 60%,#1e3a8a 100%)",padding:"46px 15px 52px",overflow:"hidden"}}>
-        <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px)",backgroundSize:"28px 28px"}}/>
-        <button onClick={()=>onNav("feed")} style={{position:"absolute",top:12,left:14,width:30,height:30,borderRadius:"50%",background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.2)",display:"flex",alignItems:"center",justifyContent:"center",color:"white"}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-        </button>
-        <div style={{position:"absolute",bottom:-40,left:15}}><Av src={user.avatar} size={76} ring="#60A5FA" online/></div>
-      </div>
-      <div style={{maxWidth:600,margin:"0 auto",padding:"50px 15px 90px"}}>
-        <div style={{marginBottom:14}}>
-          <div style={{fontWeight:800,fontSize:18,color:"var(--text)",marginBottom:5}}>{user.name}</div>
-          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:5}}>
-            <StreamPill stream={user.stream} size="md"/>
-            <span style={{fontSize:11,fontWeight:700,color:"#1A4FD6",background:"#EBF0FF",padding:"3px 10px",borderRadius:50,border:"1px solid rgba(26,79,214,.2)"}}>🎯 {user.exam}</span>
-            <span style={{fontSize:11,fontWeight:700,color:"#B97200",background:"#FFF8E6",padding:"3px 10px",borderRadius:50,border:"1px solid rgba(185,114,0,.2)"}}>⭐ {user.rankLabel}</span>
-          </div>
-          <div style={{fontSize:11,color:"var(--muted)",marginBottom:12}}>IIT Bombay CSE · Delhi · Class 12</div>
-          <div style={{display:"flex",gap:7}}>
-            <button className="btn-sm" style={{flex:2}}>🌟 Talent Profile</button>
-            <button onClick={()=>onNav("challenge-portfolio")} className="btn-sm" style={{flex:2,background:"linear-gradient(135deg,#1e3a8a,#3B5CE8)"}}>📂 Challenge Portfolio</button>
+      {/* Header */}
+      <div style={{background:"rgba(255,255,255,.97)",padding:"12px 15px 0",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)",borderBottom:"1px solid var(--b1)"}}>
+        <div style={{maxWidth:600,margin:"0 auto"}}>
+          <div style={{fontWeight:800,fontSize:16,color:"var(--text)",marginBottom:10}}>Discover 🌐</div>
+          <div style={{display:"flex",gap:0,borderBottom:"2px solid var(--b1)"}}>
+            {[["showcase","🎨 Showcase"],["opportunities","💼 Opportunities"]].map(([k,l])=>(
+              <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"8px 0",background:"none",border:"none",borderBottom:tab===k?"2px solid var(--blue)":"2px solid transparent",marginBottom:-2,color:tab===k?"var(--blue)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12,cursor:"pointer"}}>{l}</button>
+            ))}
           </div>
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7,marginBottom:14}}>
-          {[["🔥",user.streak,"Streak"],["⚡",user.xp,"XP"],["🏆",user.challengesWon,"Challenges"],["📥",user.noteDownloads>999?(user.noteDownloads/1000).toFixed(1)+"k":user.noteDownloads,"Downloads"]].map(([em,n,l])=>(
-            <div key={l} className="card" style={{padding:"10px 6px",textAlign:"center"}}>
-              <div style={{fontSize:14}}>{em}</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:15,color:"var(--text)",marginTop:2}}>{n}</div>
-              <div style={{fontSize:9,color:"var(--muted)",marginTop:1}}>{l}</div>
+      </div>
+
+      {tab==="opportunities"&&(
+        <div style={{maxWidth:600,margin:"0 auto",padding:"12px 14px 90px"}}>
+          <div className="card" style={{padding:"12px 14px",marginBottom:12,background:"linear-gradient(135deg,#0F1C3F,#1A3A8A)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div style={{fontSize:24}}>🏆</div>
+              <div style={{flex:1}}><div style={{fontSize:12,fontWeight:800,color:"#FFFFFF"}}>Win a challenge → get fast-tracked for interviews</div><div style={{fontSize:10,color:"rgba(255,255,255,.65)",marginTop:1}}>{user.challengesWon===0?"You haven't won a challenge yet.":`You've won ${user.challengesWon} challenge${user.challengesWon>1?"s":""}!`}</div></div>
+            </div>
+          </div>
+          {OPPORTUNITIES.map(o=>(
+            <div key={o.id} className="card" style={{padding:"16px",marginBottom:12}}>
+              <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+                <div style={{width:46,height:46,borderRadius:12,background:o.color||"#EBF0FF",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{o.logo}</div>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:800,fontSize:14,color:"var(--text)"}}>{o.company}</div>
+                  <div style={{fontSize:12,color:"var(--blue)",fontWeight:600,marginTop:1}}>{o.role}</div>
+                  <div style={{fontSize:11,color:"var(--muted)",marginTop:2}}>{o.location} · {o.type}</div>
+                  <div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:7}}>
+                    {o.skills.map(sk=><span key={sk} style={{fontSize:10,fontWeight:600,color:"var(--blue)",background:"#EBF0FF",padding:"2px 8px",borderRadius:50,border:"1px solid rgba(26,79,214,.15)"}}>{sk}</span>)}
+                  </div>
+                </div>
+                <button onClick={()=>setApplied(a=>a.includes(o.id)?a:([...a,o.id]))} style={{padding:"7px 14px",borderRadius:50,background:applied.includes(o.id)?"#E6FAF2":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",border:"none",color:applied.includes(o.id)?"#0A9B6A":"#fff",fontSize:11,fontWeight:700,flexShrink:0,cursor:"pointer"}}>
+                  {applied.includes(o.id)?"✓ Applied":"Apply"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <div style={{display:"flex",borderBottom:"1px solid var(--b1)",marginBottom:12}}>
-          {[["overview","Overview"],["badges","Badges"],["portfolio","Portfolio"]].map(([k,l])=>(
-            <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"9px",background:"none",border:"none",borderBottom:tab===k?"2px solid var(--blue)":"2px solid transparent",color:tab===k?"var(--blue)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12}}>{l}</button>
+      )}
+
+      {tab==="showcase"&&(
+        <div style={{maxWidth:600,margin:"0 auto",padding:"12px 14px 90px"}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",scrollbarWidth:"none",paddingBottom:8,marginBottom:4}}>
+            <button className={`chip${cf==="all"?" on":""}`} onClick={()=>setCf("all")}>All</button>
+            {CHALLENGES.filter(c=>submissions.some(s=>s.challengeId===c.id)).map(c=>(
+              <button key={c.id} onClick={()=>setCf(String(c.id))} style={{padding:"5px 12px",borderRadius:50,border:`1.5px solid ${cf===String(c.id)?"rgba(26,79,214,.4)":"rgba(15,28,63,.1)"}`,background:cf===String(c.id)?"#EBF0FF":"rgba(15,28,63,.04)",color:cf===String(c.id)?"var(--blue)":"var(--muted)",fontSize:11,fontWeight:600,whiteSpace:"nowrap",cursor:"pointer",flexShrink:0}}>{c.sponsorLogo} {c.title.split(" ").slice(0,2).join(" ")}…</button>
+            ))}
+          </div>
+          {filtered.map(s=>{
+            const st=STUDENTS.find(x=>x.id===s.studentId)||{};
+            return (
+              <div key={s.id} className="card" style={{marginBottom:10,overflow:"hidden"}}>
+                <div style={{padding:"12px 14px"}}>
+                  <div style={{display:"flex",gap:9,alignItems:"center",marginBottom:8}}>
+                    <div style={{cursor:"pointer"}} onClick={()=>onViewProfile&&onViewProfile(s.studentId)}><Av src={st.avatar||ALL_AVATARS[0]} size={34}/></div>
+                    <div style={{flex:1}}><div style={{fontWeight:700,fontSize:12,color:"var(--text)"}}>{st.name}</div><div style={{fontSize:10,color:"var(--muted)"}}>{s.timeAgo}</div></div>
+                    <button onClick={()=>onVoteSubmission(s.id)} style={{padding:"5px 12px",borderRadius:50,background:"#EBF0FF",border:"1px solid rgba(26,79,214,.2)",color:"var(--blue)",fontSize:11,fontWeight:700}}>▲ {s.votes}</button>
+                  </div>
+                  <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:4}}>{s.title}</div>
+                  <p style={{fontSize:12,color:"var(--sub)",lineHeight:1.6,marginBottom:7}}>{s.desc}</p>
+                  <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>{(s.tags||[]).map(t=><span key={t} className="tag">{t}</span>)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <BottomNav onNav={onNav} active="discover" user={user} onPost={onPost} />
+    </div>
+  );
+}
+
+
+function Profile({onNav,user,history,onPost}) {
+  const [tab,setTab]=useState("overview");
+  const [activeStatModal,setActiveStatModal]=useState(null); // "streak"|"xp"|"won"|"dls"
+  const str=STREAM[user.stream];
+  const fmtXP=n=>n>=1000?(n/1000).toFixed(1)+"K":n;
+  const streakToRecord=Math.max(0,user.streakGoals.filter(g=>g.done).length>0?
+    user.streakGoals.find(g=>!g.done)?.day-user.streak:3);
+  const weeklyRankChange=+12;
+  return (
+    <div style={{minHeight:"100vh",background:"var(--bg)",overflowX:"hidden"}}>
+      {/* Hero header */}
+      <div style={{position:"relative"}}>
+        {/* Dark hero bg */}
+        <div style={{height:120,overflow:"hidden",position:"relative"}}>
+          <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 120% 100% at 60% 0%,${str?.color||"#1A4FD6"}55 0%,transparent 60%),radial-gradient(ellipse 80% 60% at 0% 100%,#7C3AED33 0%,transparent 55%),linear-gradient(180deg,#0D0F1A 0%,#131629 100%)`}}/>
+          <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px)",backgroundSize:"28px 28px"}}/>
+          <div style={{position:"absolute",top:-60,right:-40,width:220,height:220,borderRadius:"50%",background:`${str?.color||"#1A4FD6"}22`,filter:"blur(40px)"}}/>
+          {/* Back */}
+          <button onClick={()=>onNav("feed")} style={{position:"absolute",top:14,left:14,width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,.08)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",zIndex:3}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          {/* Top-right: stream badge */}
+          <div style={{position:"absolute",top:14,right:14,zIndex:3}}>
+            <div style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:50,background:"rgba(255,255,255,.1)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.18)",fontSize:11,fontWeight:700,color:"#fff"}}>
+              {str?.emoji} {str?.label}
+            </div>
+          </div>
+
+
+
+
+        </div>
+        {/* Avatar */}
+        <div style={{position:"absolute",bottom:-46,left:20,zIndex:10}}>
+          <div style={{position:"relative",display:"inline-block"}}>
+            <div style={{width:92,height:92,borderRadius:"50%",padding:3,background:`conic-gradient(${str?.color||"#1A4FD6"},#7C3AED,${str?.color||"#1A4FD6"})`}}>
+              <img src={user.avatar} width={86} height={86} style={{borderRadius:"50%",display:"block",border:"3px solid var(--bg)",objectFit:"cover"}}/>
+            </div>
+            <div style={{position:"absolute",bottom:4,right:2,width:18,height:18,borderRadius:"50%",background:"#0A9B6A",border:"2.5px solid var(--bg)"}} className="pulse-dot"/>
+          </div>
+        </div>
+      </div>
+
+      {/* Identity row */}
+      <div style={{padding:"54px 18px 0",maxWidth:600,margin:"0 auto"}}>
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:10}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3}}>
+              <span style={{fontWeight:900,fontSize:22,color:"var(--text)",letterSpacing:"-.03em"}}>{user.name}</span>
+              {user.verified&&<span style={{fontSize:10,fontWeight:800,color:"#34D399",background:"rgba(52,211,153,.15)",padding:"2px 8px",borderRadius:50,border:"1px solid rgba(52,211,153,.3)"}}>✔ VERIFIED</span>}
+            </div>
+            <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>📍 {user.city} · 🎯 {user.exam}</div>
+            {/* Urgency pills row */}
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              <span style={{fontSize:10,fontWeight:800,color:"#FFD580",background:"rgba(255,213,128,.12)",padding:"3px 9px",borderRadius:50,border:"1px solid rgba(255,213,128,.25)"}}>{user.rankLabel}</span>
+              <span style={{fontSize:10,fontWeight:800,color:"#4ADE80",background:"rgba(74,222,128,.1)",padding:"3px 9px",borderRadius:50,border:"1px solid rgba(74,222,128,.2)"}}>Top {user.percentile}th percentile</span>
+              <span style={{fontSize:10,fontWeight:800,color:"#F87171",background:"rgba(248,113,113,.1)",padding:"3px 9px",borderRadius:50,border:"1px solid rgba(248,113,113,.2)"}}>🔴 LIVE</span>
+            </div>
+          </div>
+          <div style={{textAlign:"center",flexShrink:0}}>
+            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:20,fontWeight:900,color:"var(--text)"}}>2.4K</div>
+            <div style={{fontSize:10,color:"var(--muted)",fontWeight:600,marginTop:1}}>FOLLOWERS</div>
+          </div>
+        </div>
+
+        {/* Competitive pressure bar */}
+        {(()=>{
+          const nextMilestone=Math.ceil(user.syllabusPct/10)*10;
+          const chaptersLeft=Math.round((nextMilestone-user.syllabusPct)/10*4);
+          const aheadOf=Math.min(97,100-user.percentile+Math.floor(user.syllabusPct*.7));
+          const emoji=user.syllabusPct>=80?"🔥":user.syllabusPct>=60?"⚡":"📈";
+          return (
+            <div style={{borderRadius:16,background:"linear-gradient(135deg,#0D0F1A,#1A0A2E)",padding:"14px 16px",marginBottom:14,border:"1px solid rgba(255,255,255,.08)"}}>
+              {/* Top row */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+                <span style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",letterSpacing:".05em"}}>SYLLABUS PROGRESS</span>
+                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:15,fontWeight:900,color:str?.color||"#1A4FD6"}}>{user.syllabusPct}%</span>
+              </div>
+              {/* Bar with milestone marker */}
+              <div style={{position:"relative",height:10,borderRadius:5,background:"rgba(255,255,255,.08)",overflow:"visible",marginBottom:10}}>
+                <div style={{height:"100%",width:`${user.syllabusPct}%`,background:`linear-gradient(90deg,${str?.color||"#1A4FD6"},#7C3AED)`,borderRadius:5,boxShadow:`0 0 12px ${str?.color||"#1A4FD6"}88`,transition:"width .6s ease"}}/>
+                {/* Milestone marker */}
+                <div style={{position:"absolute",top:-3,left:`${nextMilestone}%`,transform:"translateX(-50%)",display:"flex",flexDirection:"column",alignItems:"center",gap:1}}>
+                  <div style={{width:3,height:16,background:"#FFD580",borderRadius:2,boxShadow:"0 0 6px rgba(255,213,128,.8)"}}/>
+                </div>
+              </div>
+              {/* Emotion label */}
+              <div style={{fontSize:12,fontWeight:700,color:"#fff",marginBottom:6}}>
+                {emoji} {user.syllabusPct}% — Ahead of {aheadOf}% of students
+              </div>
+              {/* Next milestone */}
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(255,213,128,.1)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,213,128,.2)"}}>
+                  <span style={{fontSize:11}}>🎯</span>
+                  <span style={{fontSize:11,fontWeight:700,color:"#FFD580"}}>Next: {nextMilestone}% — {chaptersLeft} chapter{chaptersLeft!==1?"s":""} left</span>
+                </div>
+                <span style={{fontSize:10,color:"#4ADE80",fontWeight:700}}>on track ✓</span>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Stats cards — tap to explore */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14}}>
+          {[
+            {key:"streak",em:"🔥",n:user.streak,  l:"Streak",bg:"#FFF3EC",col:"#E85D20"},
+            {key:"xp",    em:"⚡",n:fmtXP(user.xp),l:"XP",   bg:"#FFFBEB",col:"#F59E0B"},
+            {key:"won",   em:"🏆",n:user.challengesWon,l:"Won",bg:"#EFF6FF",col:"#1A4FD6"},
+            {key:"dls",   em:"📥",n:fmtXP(user.noteDownloads),l:"DLs",bg:"#F5F3FF",col:"#7C3AED"},
+          ].map(({key,em,n,l,bg,col})=>(
+            <button key={key} onClick={()=>setActiveStatModal(key)}
+              style={{background:bg,borderRadius:14,padding:"12px 4px",textAlign:"center",border:`1.5px solid ${col}33`,boxShadow:"0 2px 8px rgba(15,28,63,.06)",cursor:"pointer",position:"relative",transition:"transform .15s, box-shadow .15s"}}
+              onMouseDown={e=>e.currentTarget.style.transform="scale(.94)"}
+              onMouseUp={e=>e.currentTarget.style.transform="scale(1)"}
+              onTouchStart={e=>e.currentTarget.style.transform="scale(.94)"}
+              onTouchEnd={e=>e.currentTarget.style.transform="scale(1)"}
+            >
+              <div style={{fontSize:18,marginBottom:2}}>{em}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:900,fontSize:16,color:col}}>{n}</div>
+              <div style={{fontSize:8,color:"#aaa",marginTop:2,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>{l}</div>
+              <div style={{position:"absolute",bottom:4,right:5,fontSize:7,color:col,opacity:.5}}>▼</div>
+            </button>
           ))}
         </div>
+
+        {/* Stat Modals */}
+        {activeStatModal&&(
+          <div onClick={()=>setActiveStatModal(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:500,display:"flex",alignItems:"flex-end",animation:"fadeIn .2s"}}>
+            <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:600,margin:"0 auto",background:"#fff",borderRadius:"24px 24px 0 0",padding:"20px 20px 40px",animation:"slideUp .3s ease"}}>
+
+              {/* Streak Modal */}
+              {activeStatModal==="streak"&&(
+                <div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+                    <div><div style={{fontSize:18,fontWeight:900,color:"#1A1A2E"}}>🔥 Streak Calendar</div><div style={{fontSize:12,color:"#aaa",marginTop:2}}>{user.streak} days and counting</div></div>
+                    <button onClick={()=>setActiveStatModal(null)} style={{background:"#F4F7FD",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:16,color:"#888"}}>✕</button>
+                  </div>
+                  {/* Mini heatmap — last 35 days */}
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:4,marginBottom:16}}>
+                    {Array.from({length:35},(_,i)=>{
+                      const daysAgo=34-i;
+                      const active=daysAgo<user.streak;
+                      const isToday=daysAgo===0;
+                      return <div key={i} style={{aspectRatio:"1",borderRadius:6,background:active?"linear-gradient(135deg,#E85D20,#C2185B)":isToday?"#FFE0D0":"#F4F7FD",border:isToday?"2px solid #E85D20":"none",boxShadow:active?"0 2px 6px rgba(232,93,32,.3)":"none"}}/>;
+                    })}
+                  </div>
+                  <div style={{display:"flex",gap:8,marginBottom:16}}>
+                    {[["🔥","Current",`${user.streak}d`,"#FFF3EC","#E85D20"],["⭐","Best","88d","#FFFBEB","#F59E0B"],["📅","This Month","28/30","#EFF6FF","#1A4FD6"]].map(([em,l,v,bg,col])=>(
+                      <div key={l} style={{flex:1,background:bg,borderRadius:12,padding:"10px 8px",textAlign:"center",border:`1px solid ${col}22`}}>
+                        <div style={{fontSize:16,marginBottom:2}}>{em}</div>
+                        <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:800,fontSize:13,color:col}}>{v}</div>
+                        <div style={{fontSize:9,color:"#aaa",fontWeight:600}}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{background:"linear-gradient(135deg,#FFF3EC,#FFE8D8)",borderRadius:12,padding:"12px 14px",border:"1px solid rgba(232,93,32,.15)"}}>
+                    <div style={{fontSize:12,fontWeight:700,color:"#E85D20",marginBottom:2}}>🎯 Next milestone</div>
+                    <div style={{fontSize:13,color:"#1A1A2E"}}>{streakToRecord} more days to beat your best streak of 88!</div>
+                  </div>
+                </div>
+              )}
+
+              {/* XP Modal */}
+              {activeStatModal==="xp"&&(
+                <div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+                    <div><div style={{fontSize:18,fontWeight:900,color:"#1A1A2E"}}>⚡ XP Breakdown</div><div style={{fontSize:12,color:"#aaa",marginTop:2}}>How you earned {fmtXP(user.xp)} XP</div></div>
+                    <button onClick={()=>setActiveStatModal(null)} style={{background:"#F4F7FD",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:16,color:"#888"}}>✕</button>
+                  </div>
+                  {[
+                    {label:"Daily Streaks",xp:Math.floor(user.xp*.38),icon:"🔥",pct:38,col:"#E85D20"},
+                    {label:"Challenges",xp:Math.floor(user.xp*.28),icon:"🏆",pct:28,col:"#1A4FD6"},
+                    {label:"Post Likes",xp:Math.floor(user.xp*.18),icon:"❤️",pct:18,col:"#EF4444"},
+                    {label:"Notes Downloads",xp:Math.floor(user.xp*.11),icon:"📥",pct:11,col:"#7C3AED"},
+                    {label:"Comments",xp:Math.floor(user.xp*.05),icon:"💬",pct:5,col:"#0A9B6A"},
+                  ].map(item=>(
+                    <div key={item.label} style={{marginBottom:12}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+                        <div style={{display:"flex",alignItems:"center",gap:7}}>
+                          <span style={{fontSize:14}}>{item.icon}</span>
+                          <span style={{fontSize:12,fontWeight:600,color:"#1A1A2E"}}>{item.label}</span>
+                        </div>
+                        <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:12,fontWeight:800,color:item.col}}>+{fmtXP(item.xp)} XP</span>
+                      </div>
+                      <div style={{height:6,borderRadius:3,background:"#F4F7FD",overflow:"hidden"}}>
+                        <div style={{height:"100%",width:`${item.pct}%`,background:item.col,borderRadius:3,boxShadow:`0 0 8px ${item.col}55`}}/>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{background:"#FFFBEB",borderRadius:12,padding:"12px 14px",border:"1px solid rgba(245,158,11,.2)",marginTop:4}}>
+                    <div style={{fontSize:12,fontWeight:700,color:"#F59E0B"}}>⚡ This week</div>
+                    <div style={{fontSize:13,color:"#1A1A2E",marginTop:2}}>+320 XP · Top 8% weekly earners</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Won Modal */}
+              {activeStatModal==="won"&&(
+                <div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+                    <div><div style={{fontSize:18,fontWeight:900,color:"#1A1A2E"}}>🏆 Challenge Wins</div><div style={{fontSize:12,color:"#aaa",marginTop:2}}>{user.challengesWon} competitions won</div></div>
+                    <button onClick={()=>setActiveStatModal(null)} style={{background:"#F4F7FD",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:16,color:"#888"}}>✕</button>
+                  </div>
+                  {user.challengesWon===0?(
+                    <div style={{textAlign:"center",padding:"20px 0"}}>
+                      <div style={{fontSize:40,marginBottom:12}}>🎯</div>
+                      <div style={{fontSize:15,fontWeight:800,color:"#1A1A2E",marginBottom:6}}>No wins yet — but you're close</div>
+                      <div style={{fontSize:12,color:"#aaa",marginBottom:16}}>You've submitted to {history?.length||0} challenges. Winners are in the top 10%.</div>
+                      <button onClick={()=>{setActiveStatModal(null);onNav("challenges");}} style={{padding:"12px 24px",borderRadius:50,background:"linear-gradient(135deg,#1A4FD6,#7C3AED)",border:"none",color:"#fff",fontWeight:800,fontSize:13,cursor:"pointer"}}>Enter a Challenge →</button>
+                    </div>
+                  ):(history||[]).slice(0,3).map((h,i)=>(
+                    <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 14px",borderRadius:14,background:"#F8FAFD",border:"1px solid #E8ECF4",marginBottom:8}}>
+                      <div style={{width:38,height:38,borderRadius:12,background:"linear-gradient(135deg,#1A4FD6,#7C3AED)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🏆</div>
+                      <div style={{flex:1}}>
+                        <div style={{fontWeight:700,fontSize:13,color:"#1A1A2E"}}>{h.title}</div>
+                        <div style={{fontSize:11,color:"#aaa",marginTop:1}}>{h.completedAgo} · {h.result}</div>
+                      </div>
+                      <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:800,fontSize:12,color:"#1A4FD6"}}>+{h.xpEarned}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* DLs Modal */}
+              {activeStatModal==="dls"&&(
+                <div>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:18}}>
+                    <div><div style={{fontSize:18,fontWeight:900,color:"#1A1A2E"}}>📥 Note Downloads</div><div style={{fontSize:12,color:"#aaa",marginTop:2}}>{fmtXP(user.noteDownloads)} students use your notes</div></div>
+                    <button onClick={()=>setActiveStatModal(null)} style={{background:"#F4F7FD",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:16,color:"#888"}}>✕</button>
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
+                    {[["📥","Total Downloads",fmtXP(user.noteDownloads),"#F5F3FF","#7C3AED"],["📝","Notes Shared",`${user.notes}`,"#EFF6FF","#1A4FD6"],["⭐","Avg Rating","4.8","#FFFBEB","#F59E0B"],["🌍","Cities Reached","47","#ECFDF5","#0A9B6A"]].map(([em,l,v,bg,col])=>(
+                      <div key={l} style={{background:bg,borderRadius:14,padding:"14px 12px",border:`1px solid ${col}22`}}>
+                        <div style={{fontSize:20,marginBottom:4}}>{em}</div>
+                        <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:900,fontSize:18,color:col}}>{v}</div>
+                        <div style={{fontSize:10,color:"#aaa",fontWeight:600,marginTop:2}}>{l}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{background:"linear-gradient(135deg,#F5F3FF,#EDE9FE)",borderRadius:12,padding:"12px 14px",border:"1px solid rgba(124,58,237,.15)"}}>
+                    <div style={{fontSize:12,fontWeight:700,color:"#7C3AED",marginBottom:2}}>🚀 Impact</div>
+                    <div style={{fontSize:13,color:"#1A1A2E"}}>Your notes helped {fmtXP(user.noteDownloads)} students prepare for their exams 💙</div>
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        )}
+
+        {/* "Compete with me" CTA */}
+        <div style={{display:"flex",gap:8,marginBottom:18}}>
+          <button onClick={()=>onNav("challenges")} style={{flex:3,padding:"11px 0",borderRadius:50,background:"linear-gradient(135deg,#0D0F1A,#1A0A2E)",border:"1px solid rgba(255,255,255,.1)",color:"#fff",fontSize:12,fontWeight:800,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+            ⚔️ Challenge Me
+          </button>
+          <button onClick={()=>onNav("challenge-portfolio")} style={{flex:2,padding:"11px 0",borderRadius:50,background:"#fff",border:"1.5px solid var(--b2)",color:"var(--sub)",fontSize:12,fontWeight:700,cursor:"pointer"}}>📂 Portfolio</button>
+        </div>
+        <div style={{display:"flex",gap:2,background:"#E8ECF4",borderRadius:14,padding:4,marginBottom:18}}>
+          {[["overview","Overview"],["badges","Badges"],["portfolio","Portfolio"]].map(([k,l])=>(
+            <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"9px",borderRadius:11,background:tab===k?"#fff":"none",border:"none",color:tab===k?"var(--text)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12,transition:"all .18s"}}>
+              {l}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab content */}
         {tab==="overview"&&(
           <div className="fi">
-            <div className="card" style={{padding:"14px 16px",marginBottom:12,background:"linear-gradient(135deg,#0F1C3F,#1A3A8A)"}}>
-              <div style={{fontSize:10,fontWeight:700,color:"rgba(147,197,253,.9)",letterSpacing:".04em",marginBottom:6}}>🎯 GOAL</div>
-              <div style={{fontSize:13,fontWeight:800,color:"#FFFFFF",marginBottom:10}}>{user.goal}</div>
-              <div style={{height:5,borderRadius:3,background:"rgba(255,255,255,.15)",overflow:"hidden",marginBottom:4}}>
-                <div style={{height:"100%",width:`${user.syllabusPct}%`,background:"linear-gradient(90deg,#60A5FA,#93C5FD)",borderRadius:3}}/>
+            {/* Goal card */}
+            <div style={{borderRadius:20,overflow:"hidden",marginBottom:12,background:"#fff",border:"1px solid var(--b1)",padding:"16px",boxShadow:"0 2px 8px rgba(15,28,63,.05)"}}>
+              <div style={{fontSize:10,fontWeight:800,color:"var(--muted)",letterSpacing:".06em",marginBottom:6}}>🎯 EXAM GOAL</div>
+              <div style={{fontSize:15,fontWeight:800,color:"var(--text)",marginBottom:12}}>{user.goal}</div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                <span style={{fontSize:11,fontWeight:700,color:"var(--sub)"}}>Syllabus Progress</span>
+                <span style={{fontSize:11,fontWeight:800,color:str?.color||"#1A4FD6"}}>{user.syllabusPct}%</span>
               </div>
-              <div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:10,color:"rgba(255,255,255,.5)"}}>
-                <span>Syllabus {user.syllabusPct}% complete</span><span>{user.exam} in {user.daysToExam} days</span>
+              <div style={{height:6,borderRadius:3,background:"rgba(15,28,63,.08)",overflow:"hidden",marginBottom:6}}>
+                <div style={{height:"100%",width:`${user.syllabusPct}%`,background:`linear-gradient(90deg,${str?.color||"#1A4FD6"},#7C3AED)`,borderRadius:3}}/>
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"var(--muted)"}}>
+                <span>{user.syllabusPct}% complete</span><span>{user.daysToExam} days left</span>
               </div>
             </div>
-            {user.skillLevels.map(([sk,pct,col])=>(
-              <div key={sk} style={{marginBottom:9}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600,color:"var(--sub)"}}>{sk}</span><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:col,fontWeight:700}}>{pct}%</span></div>
-                <div className="skill-bar"><div className="skill-fill" style={{width:`${pct}%`,background:col}}/></div>
-              </div>
-            ))}
-            <div className="card" style={{padding:"14px 16px",marginTop:14}}>
-              <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:16}}>Streak Goals 🔥</div>
+            {/* Skills */}
+            <div style={{borderRadius:20,padding:"16px",background:"#fff",border:"1px solid var(--b1)",marginBottom:12,boxShadow:"0 2px 8px rgba(15,28,63,.05)"}}>
+              <div style={{fontWeight:800,fontSize:13,color:"var(--text)",marginBottom:12}}>Skills</div>
+              {user.skillLevels.map(([sk,pct,col])=>(
+                <div key={sk} style={{marginBottom:10}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                    <span style={{fontSize:12,fontWeight:600,color:"var(--sub)"}}>{sk}</span>
+                    <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:col,fontWeight:700}}>{pct}%</span>
+                  </div>
+                  <div style={{height:5,borderRadius:3,background:"rgba(15,28,63,.08)",overflow:"hidden"}}>
+                    <div style={{height:"100%",width:`${pct}%`,background:col,borderRadius:3,boxShadow:`0 0 8px ${col}66`}}/>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Streak timeline */}
+            <div style={{borderRadius:20,padding:"16px",background:"#fff",border:"1px solid var(--b1)",marginBottom:12,boxShadow:"0 2px 8px rgba(15,28,63,.05)"}}>
+              <div style={{fontWeight:800,fontSize:13,color:"var(--text)",marginBottom:14}}>Streak Goals 🔥</div>
               <div style={{display:"flex",alignItems:"center",padding:"0 4px"}}>
                 {user.streakGoals.map((g,i,arr)=>(
                   <div key={g.day} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",position:"relative"}}>
-                    {i<arr.length-1&&<div style={{position:"absolute",top:14,left:"50%",right:"-50%",height:2,background:g.done?"#1A4FD6":"#E2E8F4",zIndex:0}}/>}
-                    <div style={{width:30,height:30,borderRadius:"50%",background:g.done?"#1A4FD6":"white",border:`2px solid ${g.done?"#1A4FD6":"#C8D4EC"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,zIndex:1,position:"relative",boxShadow:g.done?"0 2px 8px rgba(26,79,214,.3)":"none"}}>{g.done?"✓":g.day<=user.streak?"🔥":"⬜"}</div>
-                    <div style={{fontSize:9,fontWeight:700,color:g.done?"#1A4FD6":"var(--muted)",marginTop:5}}>{g.day}d</div>
+                    {i<arr.length-1&&<div style={{position:"absolute",top:14,left:"50%",right:"-50%",height:2,background:g.done?str?.color||"#1A4FD6":"#E8ECF4",zIndex:0}}/>}
+                    <div style={{width:30,height:30,borderRadius:"50%",background:g.done?str?.color||"#1A4FD6":"rgba(255,255,255,.08)",border:`2px solid ${g.done?str?.color||"#1A4FD6":"rgba(255,255,255,.15)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,zIndex:1,position:"relative",boxShadow:g.done?`0 0 12px ${str?.color||"#1A4FD6"}66`:"none"}}>{g.done?"✓":"·"}</div>
+                    <div style={{fontSize:9,fontWeight:700,color:"var(--sub)",marginTop:5}}>{g.day}d</div>
                     <div style={{fontSize:8,color:"var(--muted)",marginTop:1}}>{g.label}</div>
                   </div>
                 ))}
@@ -952,93 +2166,132 @@ function Profile({onNav,user,history}) {
         )}
         {tab==="badges"&&(
           <div className="fi">
-            <div style={{fontSize:10,color:"var(--muted)",marginBottom:10}}>Earned badges are visible to companies on your Talent Profile.</div>
-            <div style={{display:"flex",flexDirection:"column",gap:7}}>{PROOF_BADGES.map(b=><ProofBadge key={b.id} badge={b}/>)}</div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:12,fontWeight:500}}>Earned badges are visible to companies on your Talent Profile.</div>
+            <div style={{display:"flex",flexDirection:"column",gap:8}}>
+              {PROOF_BADGES.map(b=>{
+                const col=BADGE_COLORS[b.tier]||"#7988A8";
+                return (
+                  <div key={b.id} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderRadius:18,background:b.earned?"#fff":"#F8FAFC",border:`1px solid ${b.earned?col+"40":"var(--b1)"}`,opacity:b.earned?1:.4}}>
+                    <div style={{width:44,height:44,borderRadius:14,background:b.earned?BADGE_TIERS[b.tier]:"#F0F4FA",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>{b.emoji}</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:13,fontWeight:700,color:b.earned?col:"var(--muted)"}}>{b.label}</div>
+                      <div style={{fontSize:10,color:"var(--muted)",marginTop:2}}>{b.desc}</div>
+                    </div>
+                    {b.earned&&<div style={{fontSize:9,fontWeight:800,color:col,background:`${col}18`,padding:"3px 8px",borderRadius:50,textTransform:"uppercase",letterSpacing:".04em"}}>{b.tier}</div>}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
         {tab==="portfolio"&&(
           <div className="fi">
-            <div style={{marginBottom:12,padding:"10px 12px",borderRadius:10,background:"#EBF0FF",border:"1px solid rgba(26,79,214,.15)"}}><div style={{fontSize:12,fontWeight:700,color:"#1A4FD6",marginBottom:2}}>📂 Challenge Portfolio</div><div style={{fontSize:10,color:"var(--muted)"}}>Each completed challenge is proof of real skill.</div></div>
+            <div style={{padding:"11px 14px",borderRadius:14,background:"#EEF4FF",border:"1px solid rgba(26,79,214,.15)",marginBottom:12}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#1A4FD6",marginBottom:2}}>📂 Challenge Portfolio</div>
+              <div style={{fontSize:10,color:"var(--muted)"}}>Each completed challenge is proof of real skill.</div>
+            </div>
             {history.map((h,i)=>(
-              <div key={i} className="card2" style={{padding:"12px",marginBottom:8}}>
-                <div style={{fontWeight:700,fontSize:12,color:"var(--text)",marginBottom:3}}>{h.title}</div>
-                <div style={{fontSize:10,color:"var(--muted)",marginBottom:7}}>{h.sponsor} · {h.completedAgo}</div>
+              <div key={i} style={{padding:"14px 16px",borderRadius:18,background:"#fff",border:"1px solid var(--b1)",marginBottom:8,boxShadow:"0 2px 6px rgba(15,28,63,.05)"}}>
+                <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:3}}>{h.title}</div>
+                <div style={{fontSize:10,color:"var(--muted)",marginBottom:8}}>{h.sponsor} · {h.completedAgo}</div>
                 <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                  <span style={{fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:50,background:"#EBF0FF",color:"var(--blue)",border:"1px solid rgba(26,79,214,.2)"}}>{h.result}</span>
-                  {h.badge&&<span style={{fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:50,background:"#FFF8E6",color:"#B97200",border:"1px solid rgba(185,114,0,.2)"}}>{h.badge}</span>}
-                  <XPTag xp={h.xpEarned}/>
+                  <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:50,background:"rgba(26,79,214,.2)",color:"#93C5FD",border:"1px solid rgba(26,79,214,.3)"}}>{h.result}</span>
+                  {h.badge&&<span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:50,background:"rgba(185,114,0,.15)",color:"#FFD580",border:"1px solid rgba(185,114,0,.25)"}}>{h.badge}</span>}
+                  <span style={{fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:50,background:"rgba(26,79,214,.15)",color:"#93C5FD",border:"1px solid rgba(26,79,214,.2)",fontFamily:"'JetBrains Mono',monospace"}}>⚡{h.xpEarned}XP</span>
                 </div>
               </div>
             ))}
-            <button onClick={()=>onNav("challenge-portfolio")} className="btn-ghost" style={{marginTop:8}}>View full portfolio →</button>
+            <button onClick={()=>onNav("challenge-portfolio")} style={{width:"100%",padding:"13px",borderRadius:14,background:"#fff",border:"1.5px solid var(--b2)",color:"var(--sub)",fontWeight:700,fontSize:13,cursor:"pointer",marginTop:4}}>View full portfolio →</button>
           </div>
         )}
+        <div style={{height:100}}/>
       </div>
-      <BottomNav onNav={onNav} active="profile"/>
+      <BottomNav onNav={onNav} active="profile" user={user} onPost={onPost} />
     </div>
   );
 }
 
 
-
 // ─── Comment Drawer ───────────────────────────────────────────────────────────
-function CommentDrawer({post,onClose,onAddComment,currentUser}) {
+// Helper to get comments for a post
+function getPostComments(postId, extraComments) {
+  const seed = (INIT_POST_COMMENTS[postId]||[]);
+  return [...seed, ...(extraComments||[])];
+}
+
+
+function CommentDrawer({post,onClose,onAddComment,currentUser,extraComments,liked,setLiked}) {
   const [input,setInput]=useState("");
-  const [comments,setComments]=useState(post._comments||[
-    {id:1,name:"Priya Menon",  avatar:ALL_AVATARS[0], text:"Great progress! Keep it up 💪", time:"2h ago",  likes:12},
-    {id:2,name:"Kavya Reddy",  avatar:ALL_AVATARS[7], text:"Which resource are you using for this?", time:"1h ago", likes:5},
-    {id:3,name:"Ishaan Verma", avatar:ALL_AVATARS[2], text:"Same struggle here, it clicked on day 3 for me too!", time:"45m ago",likes:8},
-  ]);
+  const [likedComments,setLikedComments]=useState([]);
+  const allComments=getPostComments(post.id, extraComments||[]);
+  const userAdded=(extraComments||[]).length;
+  const totalCount=post.comments+userAdded;
+
   const submit=()=>{
     if(!input.trim()) return;
-    const c={id:Date.now(),name:currentUser.name,avatar:currentUser.avatar,text:input.trim(),time:"just now",likes:0};
-    setComments(p=>[...p,c]);
+    const c={id:Date.now(),studentId:currentUser.id,name:currentUser.name,avatar:currentUser.avatar,text:input.trim(),time:"just now",likes:0};
     onAddComment&&onAddComment(post.id,c);
     setInput("");
   };
+
   return (
     <div style={{position:"fixed",inset:0,zIndex:300,display:"flex",flexDirection:"column",justifyContent:"flex-end"}} onClick={onClose}>
       <div style={{position:"absolute",inset:0,background:"rgba(15,28,63,.5)",backdropFilter:"blur(8px)"}}/>
-      <div style={{position:"relative",background:"#fff",borderRadius:"20px 20px 0 0",maxHeight:"80vh",display:"flex",flexDirection:"column"}} onClick={e=>e.stopPropagation()}>
-        <div style={{padding:"10px 16px 6px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid var(--b1)"}}>
-          <div style={{fontWeight:700,fontSize:14,color:"var(--text)"}}>Comments · {comments.length}</div>
-          <button onClick={onClose} style={{background:"none",border:"none",color:"var(--muted)",fontSize:18,lineHeight:1}}>✕</button>
+      <div style={{position:"relative",background:"#fff",borderRadius:"22px 22px 0 0",maxHeight:"88vh",display:"flex",flexDirection:"column"}} onClick={e=>e.stopPropagation()}>
+        {/* Handle */}
+        <div style={{display:"flex",justifyContent:"center",paddingTop:10}}>
+          <div style={{width:36,height:4,borderRadius:2,background:"#E0E6F0"}}/>
+        </div>
+        {/* Header */}
+        <div style={{padding:"10px 16px 10px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"1px solid #F0F4FA"}}>
+          <div style={{fontWeight:800,fontSize:15,color:"var(--text)"}}>Comments <span style={{color:"var(--muted)",fontWeight:500,fontSize:13}}>({totalCount})</span></div>
+          <button onClick={onClose} style={{width:28,height:28,borderRadius:"50%",background:"#F0F4FA",border:"none",fontSize:14,color:"#666",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         </div>
         {/* Original post snippet */}
-        <div style={{padding:"10px 16px",borderBottom:"1px solid var(--b1)",background:"#F8FAFF"}}>
-          <div style={{display:"flex",gap:8,alignItems:"flex-start"}}>
-            <Av src={post.avatar} size={30}/>
-            <div>
-              <div style={{fontWeight:700,fontSize:11,color:"var(--text)"}}>{post.name}</div>
-              <div style={{fontSize:11,color:"var(--sub)",lineHeight:1.5,marginTop:2}}>{post.text.slice(0,100)}{post.text.length>100?"…":""}</div>
+        <div style={{padding:"10px 16px 10px",borderBottom:"1px solid #F0F4FA",background:"#FAFBFF"}}>
+          <div style={{display:"flex",gap:9,alignItems:"flex-start"}}>
+            <img src={post.avatar} width={34} height={34} style={{borderRadius:"50%",border:"1.5px solid #E8ECF2",flexShrink:0}}/>
+            <div style={{minWidth:0}}>
+              <span style={{fontWeight:700,fontSize:12,color:"var(--text)"}}>{post.name}</span>
+              <span style={{fontSize:12,color:"var(--sub)",marginLeft:6,lineHeight:1.5}}>{post.text.slice(0,110)}{post.text.length>110?"…":""}</span>
             </div>
           </div>
         </div>
         {/* Comments list */}
-        <div style={{overflowY:"auto",flex:1,padding:"10px 16px"}}>
-          {comments.map(c=>(
-            <div key={c.id} style={{display:"flex",gap:9,marginBottom:14}}>
-              <Av src={c.avatar||ALL_AVATARS[0]} size={32}/>
+        <div style={{overflowY:"auto",flex:1,padding:"12px 16px 8px"}}>
+          {totalCount>allComments.length&&(
+            <div style={{textAlign:"center",padding:"8px 0 14px",fontSize:11,color:"var(--muted)"}}>
+              Showing top comments · {totalCount.toLocaleString()} total
+            </div>
+          )}
+          {allComments.length===0&&(
+            <div style={{textAlign:"center",padding:"30px 0",color:"var(--muted)",fontSize:13}}>No comments yet. Be the first! 💬</div>
+          )}
+          {allComments.map(c=>(
+            <div key={c.id} style={{display:"flex",gap:9,marginBottom:16}}>
+              <img src={c.avatar||ALL_AVATARS[0]} width={34} height={34} style={{borderRadius:"50%",flexShrink:0,border:"1.5px solid #E8ECF2"}}/>
               <div style={{flex:1}}>
-                <div style={{background:"#F4F7FD",borderRadius:"0 12px 12px 12px",padding:"8px 12px"}}>
-                  <div style={{fontWeight:700,fontSize:11,color:"var(--text)",marginBottom:3}}>{c.name}</div>
-                  <div style={{fontSize:12,color:"var(--sub)",lineHeight:1.55}}>{c.text}</div>
+                <div style={{background:"#F4F7FD",borderRadius:"0 14px 14px 14px",padding:"9px 13px"}}>
+                  <div style={{fontWeight:700,fontSize:12,color:"var(--text)",marginBottom:3}}>{c.name}</div>
+                  <div style={{fontSize:13,color:"#1A1A2E",lineHeight:1.55}}>{c.text}</div>
                 </div>
-                <div style={{display:"flex",gap:12,marginTop:4,paddingLeft:4}}>
-                  <span style={{fontSize:10,color:"var(--muted)"}}>{c.time}</span>
-                  <span style={{fontSize:10,color:"var(--muted)",cursor:"pointer"}}>❤️ {c.likes}</span>
-                  <span style={{fontSize:10,color:"var(--blue)",cursor:"pointer",fontWeight:600}}>Reply</span>
+                <div style={{display:"flex",gap:14,marginTop:5,paddingLeft:4,alignItems:"center"}}>
+                  <span style={{fontSize:10,color:"#bbb"}}>{c.time}</span>
+                  <button onClick={()=>setLikedComments(l=>l.includes(c.id)?l.filter(x=>x!==c.id):[...l,c.id])} style={{background:"none",border:"none",padding:0,fontSize:10,color:likedComments.includes(c.id)?"#E0245E":"var(--muted)",fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:3}}>
+                    {likedComments.includes(c.id)?"❤️":"🤍"} {c.likes+(likedComments.includes(c.id)?1:0)}
+                  </button>
+                  <button style={{background:"none",border:"none",padding:0,fontSize:10,color:"var(--blue)",fontWeight:700,cursor:"pointer"}}>Reply</button>
                 </div>
               </div>
             </div>
           ))}
         </div>
         {/* Input */}
-        <div style={{padding:"10px 14px 20px",borderTop:"1px solid var(--b1)",display:"flex",gap:8,alignItems:"center",background:"#fff"}}>
-          <Av src={currentUser.avatar} size={32}/>
-          <div style={{flex:1,display:"flex",gap:6,alignItems:"center",background:"#F4F7FD",borderRadius:50,padding:"6px 14px 6px 12px",border:"1.5px solid var(--b2)"}}>
-            <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder="Add a comment…" style={{flex:1,background:"none",border:"none",outline:"none",fontSize:12,color:"var(--text)"}}/>
-            <button onClick={submit} style={{background:"none",border:"none",color:input.trim()?"var(--blue)":"var(--muted)",fontWeight:700,fontSize:12,flexShrink:0}}>Post</button>
+        <div style={{padding:"10px 14px 24px",borderTop:"1px solid #F0F4FA",display:"flex",gap:8,alignItems:"center",background:"#fff"}}>
+          <img src={currentUser.avatar} width={34} height={34} style={{borderRadius:"50%",border:"1.5px solid #E8ECF2",flexShrink:0}}/>
+          <div style={{flex:1,display:"flex",gap:6,alignItems:"center",background:"#F4F7FD",borderRadius:50,padding:"8px 14px",border:"1.5px solid #E8ECF2"}}>
+            <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&submit()} placeholder={`Reply as ${currentUser.name.split(" ")[0]}…`} style={{flex:1,background:"none",border:"none",outline:"none",fontSize:13,color:"var(--text)"}}/>
+            <button onClick={submit} style={{background:"none",border:"none",color:input.trim()?"var(--blue)":"#ccc",fontWeight:800,fontSize:13,flexShrink:0,cursor:input.trim()?"pointer":"default"}}>Post</button>
           </div>
         </div>
       </div>
@@ -1046,6 +2299,8 @@ function CommentDrawer({post,onClose,onAddComment,currentUser}) {
   );
 }
 
+
+// ─── Share Sheet ───────────────────────────────────────────────────────────────
 // ─── Share Sheet ───────────────────────────────────────────────────────────────
 function ShareSheet({post,onClose}) {
   const [copied,setCopied]=useState(false);
@@ -1091,123 +2346,183 @@ function ShareSheet({post,onClose}) {
   );
 }
 
+// ─── Follow Button ────────────────────────────────────────────────────────────
+function FollowButton({id,name,isFollowed,onFollow,followers=800}) {
+  const [justFollowed,setJustFollowed]=useState(false);
+  const [showToast,setShowToast]=useState(false);
+  const count=followers+(isFollowed?1:0);
+  const fmt=n=>n>=1000?(n/1000).toFixed(1)+"K":n;
+
+  const handle=()=>{
+    onFollow(id);
+    if(!isFollowed){
+      setJustFollowed(true);
+      setShowToast(true);
+      setTimeout(()=>setShowToast(false),3000);
+    } else {
+      setJustFollowed(false);
+    }
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,flexShrink:0,position:"relative"}}>
+      {/* Micro-feedback toast */}
+      {showToast&&(
+        <div style={{position:"absolute",top:-52,right:0,background:"#0D0F1A",borderRadius:12,padding:"7px 12px",whiteSpace:"nowrap",fontSize:11,fontWeight:600,color:"#fff",boxShadow:"0 4px 20px rgba(0,0,0,.35)",border:"1px solid rgba(255,255,255,.1)",animation:"slideDown .3s ease",zIndex:50}}>
+          You'll see {name}'s progress 🔥
+          <div style={{position:"absolute",bottom:-5,right:18,width:10,height:10,background:"#0D0F1A",transform:"rotate(45deg)",border:"0 solid transparent",borderRight:"1px solid rgba(255,255,255,.1)",borderBottom:"1px solid rgba(255,255,255,.1)"}}/>
+        </div>
+      )}
+      <button onClick={handle} style={{padding:"10px 20px",borderRadius:50,background:isFollowed?"#F0F4FB":"linear-gradient(135deg,#1A4FD6,#7C3AED)",color:isFollowed?"var(--muted)":"#fff",border:isFollowed?"1.5px solid var(--b2)":"none",fontWeight:800,fontSize:12,cursor:"pointer",boxShadow:isFollowed?"none":"0 4px 16px rgba(26,79,214,.4)",transition:"all .2s",transform:justFollowed&&!isFollowed?"scale(1.08)":"scale(1)"}}>
+        {isFollowed?"✓ Following":"+ Follow"}
+      </button>
+      <div style={{fontSize:10,color:"var(--muted)",fontWeight:600,letterSpacing:".02em"}}>{fmt(count)} followers</div>
+    </div>
+  );
+}
+
 // ─── Student Profile (view any user) ─────────────────────────────────────────
 function StudentProfile({studentId,onBack,onFollow,followed}) {
   const s=STUDENTS.find(x=>x.id===studentId)||STUDENTS[0];
   const posts=FEED_POSTS.filter(p=>p.studentId===s.id);
   const isFollowed=followed.includes(s.id);
   const [tab,setTab]=useState("posts");
+  const [showMsg,setShowMsg]=useState(false);
+  const str=STREAM[s.stream];
+  const fmtXP=n=>n>=1000?(n/1000).toFixed(1)+"K":n;
+  const nextMilestone=Math.ceil(s.syllabusPct/10)*10;
+  const chaptersLeft=Math.round((nextMilestone-s.syllabusPct)/10*4);
+  const aheadOf=Math.min(97,100-s.percentile+Math.floor(s.syllabusPct*.7));
+  const firstName=s.name.split(" ")[0];
+
+  // Personalised invite messages
+  const inviteMsgs=[
+    `Hey ${firstName}! 👋 Saw your ${s.skillLevels[0][0]} score (${s.skillLevels[0][1]}%) — that's impressive. Would love to study together! 🔥`,
+    `${firstName}, your ${s.streak}-day streak is insane 💪 I'm on a ${Math.floor(s.streak*.6)}-day streak — let's push each other to the top!`,
+    `Hey! I'm also preparing for ${s.exam} 🎯 Your notes on ${s.skillLevels[0][0]} helped me a lot. Can we connect?`,
+    `${firstName} you're Rank #${s.rank} — I want to learn from the best! Would you be open to a quick study session? ⚡`,
+  ];
+  const [selectedMsg,setSelectedMsg]=useState(0);
+  const [customMsg,setCustomMsg]=useState("");
+  const [sent,setSent]=useState(false);
+
   return (
     <div style={{position:"fixed",inset:0,zIndex:200,background:"var(--bg)",overflowY:"auto",animation:"slideInRight .25s ease"}}>
-      {/* Cover banner */}
-      <div style={{position:"relative",height:160,background:`linear-gradient(135deg,${STREAM[s.stream]?.color||"#1A4FD6"}cc,#0F1C3F)`,overflow:"hidden",flexShrink:0}}>
-        <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px)",backgroundSize:"24px 24px"}}/>
-        {/* decorative circles */}
-        <div style={{position:"absolute",right:-40,top:-40,width:180,height:180,borderRadius:"50%",background:"rgba(255,255,255,.06)"}}/>
-        <div style={{position:"absolute",right:40,bottom:-30,width:100,height:100,borderRadius:"50%",background:"rgba(255,255,255,.04)"}}/>
-        {/* back button */}
-        <button onClick={onBack} style={{position:"absolute",top:14,left:14,width:34,height:34,borderRadius:"50%",background:"rgba(0,0,0,.3)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.2)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",zIndex:2}}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-        </button>
-        {/* stream badge top right */}
-        <div style={{position:"absolute",top:14,right:14,zIndex:2}}>
-          <StreamPill stream={s.stream} size="sm"/>
+      {/* Hero */}
+      <div style={{position:"relative"}}>
+        <div style={{height:120,overflow:"hidden",position:"relative"}}>
+          <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse 130% 100% at 65% -10%,${str?.color||"#1A4FD6"}55 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 10% 110%,#7C3AED33 0%,transparent 55%),linear-gradient(180deg,#131629 0%,#0D0F1A 100%)`}}/>
+          <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px)",backgroundSize:"28px 28px"}}/>
+          <div style={{position:"absolute",top:-50,right:-30,width:200,height:200,borderRadius:"50%",background:`${str?.color||"#1A4FD6"}1a`,filter:"blur(40px)"}}/>
+          <button onClick={onBack} style={{position:"absolute",top:14,left:14,width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,.08)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.15)",display:"flex",alignItems:"center",justifyContent:"center",color:"white",zIndex:3}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+          </button>
+          <div style={{position:"absolute",top:14,right:14,zIndex:3}}>
+            <div style={{display:"flex",alignItems:"center",gap:5,padding:"5px 11px",borderRadius:50,background:"rgba(255,255,255,.1)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.18)",fontSize:11,fontWeight:700,color:"#fff"}}>
+              {str?.emoji} {str?.label}
+            </div>
+          </div>
         </div>
-        {/* exam countdown pill */}
-        <div style={{position:"absolute",bottom:14,right:14,background:"rgba(0,0,0,.35)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:50,padding:"5px 12px",display:"flex",alignItems:"center",gap:5}}>
-          <span style={{fontSize:10,fontWeight:800,color:"#FFD580"}}>⏳</span>
-          <span style={{fontSize:10,fontWeight:700,color:"rgba(255,255,255,.9)"}}>{s.daysToExam} days to {s.exam}</span>
+        <div style={{position:"absolute",bottom:-46,left:18,zIndex:10}}>
+          <div style={{position:"relative",display:"inline-block"}}>
+            <div style={{width:92,height:92,borderRadius:"50%",padding:3,background:`conic-gradient(${str?.color||"#1A4FD6"},#7C3AED,${str?.color||"#1A4FD6"})`}}>
+              <img src={s.avatar} width={86} height={86} alt="" style={{borderRadius:"50%",display:"block",border:"3px solid var(--bg)",objectFit:"cover"}}/>
+            </div>
+            {s.verified&&<div style={{position:"absolute",bottom:4,right:2,width:20,height:20,background:"#0A9B6A",borderRadius:"50%",border:"2.5px solid var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"white",fontWeight:900}}>✓</div>}
+          </div>
         </div>
       </div>
 
-      {/* Avatar row — pops out of banner */}
-      <div style={{maxWidth:600,margin:"0 auto",padding:"0 16px"}}>
-        <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginTop:-44,marginBottom:12,position:"relative",zIndex:2}}>
-          <div style={{position:"relative"}}>
-            <img src={s.avatar} width={88} height={88} alt="" style={{borderRadius:"50%",border:"4px solid var(--bg)",background:"#E8EEF8",display:"block",boxShadow:"0 4px 20px rgba(15,28,63,.18)"}}/>
-            {(s.id===1||s.id===8)&&<div style={{position:"absolute",bottom:4,right:4,width:16,height:16,background:"#0A9B6A",borderRadius:"50%",border:"2.5px solid var(--bg)"}} className="pulse-dot"/>}
-            {s.verified&&<div style={{position:"absolute",bottom:2,right:2,width:22,height:22,background:"#0A9B6A",borderRadius:"50%",border:"2.5px solid var(--bg)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"white",fontWeight:900}}>✓</div>}
+      <div style={{maxWidth:600,margin:"0 auto",padding:"56px 18px 0"}}>
+        {/* Identity + follow */}
+        <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:8}}>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
+              <span style={{fontWeight:900,fontSize:21,color:"var(--text)",letterSpacing:"-.03em"}}>{s.name}</span>
+              {s.verified&&<span style={{fontSize:10,fontWeight:800,color:"#34D399",background:"rgba(52,211,153,.15)",padding:"2px 8px",borderRadius:50,border:"1px solid rgba(52,211,153,.3)"}}>✔ VERIFIED</span>}
+            </div>
+            <div style={{fontSize:11,color:"var(--muted)",marginBottom:8}}>📍 {s.city} · 🎯 {s.exam}</div>
+            <div style={{display:"flex",gap:5,flexWrap:"wrap"}}>
+              <span style={{fontSize:10,fontWeight:800,color:"#FFD580",background:"rgba(255,213,128,.12)",padding:"3px 9px",borderRadius:50,border:"1px solid rgba(255,213,128,.25)"}}>{s.rankLabel}</span>
+              <span style={{fontSize:10,fontWeight:800,color:"#4ADE80",background:"rgba(74,222,128,.1)",padding:"3px 9px",borderRadius:50,border:"1px solid rgba(74,222,128,.2)"}}>Top {s.percentile}th %ile</span>
+            </div>
           </div>
-          <div style={{display:"flex",gap:8,paddingBottom:6}}>
-            <button onClick={()=>onFollow(s.id)} style={{padding:"9px 20px",borderRadius:50,background:isFollowed?"#fff":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",color:isFollowed?"#1A4FD6":"#fff",border:isFollowed?"1.5px solid rgba(26,79,214,.3)":"none",fontWeight:800,fontSize:12,boxShadow:isFollowed?"none":"0 3px 12px rgba(26,79,214,.3)"}}>
-              {isFollowed?"✓ Following":"+ Follow"}
-            </button>
-          </div>
+          <FollowButton id={s.id} name={firstName} isFollowed={isFollowed} onFollow={onFollow} followers={s.noteDownloads?Math.floor(s.noteDownloads/3):800}/>
         </div>
 
-        {/* Name + meta */}
-        <div style={{marginBottom:12}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:3}}>
-            <span style={{fontWeight:900,fontSize:20,color:"var(--text)",letterSpacing:"-.02em"}}>{s.name}</span>
-            {s.verified&&<span style={{fontSize:9,fontWeight:800,color:"#0A9B6A",background:"rgba(10,155,106,.12)",padding:"2px 8px",borderRadius:50,border:"1px solid rgba(10,155,106,.2)",letterSpacing:".02em"}}>✔ VERIFIED</span>}
-            <span style={{fontSize:10,fontWeight:700,color:"#B97200",background:"#FFF8E6",padding:"2px 9px",borderRadius:50,border:"1px solid rgba(185,114,0,.2)"}}>{s.rankLabel}</span>
-          </div>
-          <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>📍 {s.city} &nbsp;·&nbsp; 🎯 {s.goal}</div>
-          {/* Syllabus progress bar */}
-          <div style={{marginBottom:10}}>
-            <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-              <span style={{fontSize:11,fontWeight:600,color:"var(--sub)"}}>Syllabus Progress</span>
-              <span style={{fontSize:11,fontWeight:800,color:"var(--blue)",fontFamily:"'JetBrains Mono',monospace"}}>{s.syllabusPct}%</span>
-            </div>
-            <div style={{height:7,borderRadius:4,background:"rgba(15,28,63,.08)",overflow:"hidden"}}>
-              <div style={{height:"100%",width:`${s.syllabusPct}%`,background:`linear-gradient(90deg,${STREAM[s.stream]?.color||"#1A4FD6"},#3B5CE8)`,borderRadius:4,transition:"width .8s ease"}}/>
-            </div>
-          </div>
-        </div>
+        {/* Message Button */}
+        <button onClick={()=>setShowMsg(true)} style={{width:"100%",padding:"12px",borderRadius:14,background:isFollowed?"linear-gradient(135deg,#1A4FD6,#7C3AED)":"#fff",border:isFollowed?"none":"1.5px solid var(--b2)",color:isFollowed?"#fff":"var(--text)",fontWeight:700,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:14,boxShadow:isFollowed?"0 4px 16px rgba(26,79,214,.3)":"0 1px 4px rgba(15,28,63,.06)"}}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          {isFollowed?`Message ${firstName}`:`Send ${firstName} a Study Invite 💌`}
+        </button>
 
         {/* Stats row */}
-        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:16}}>
-          {[["🔥",s.streak,"Streak"],["⚡",s.xp>999?(s.xp/1000).toFixed(1)+"k":s.xp,"XP"],["🏆",s.challengesWon,"Won"],["📥",s.noteDownloads>999?(s.noteDownloads/1000).toFixed(1)+"k":s.noteDownloads,"DLs"]].map(([em,n,l])=>(
-            <div key={l} style={{background:"#fff",borderRadius:14,padding:"12px 6px",textAlign:"center",border:"1px solid var(--b1)",boxShadow:"0 1px 6px rgba(15,28,63,.05)"}}>
-              <div style={{fontSize:16,marginBottom:3}}>{em}</div>
-              <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:800,fontSize:15,color:"var(--text)"}}>{n}</div>
-              <div style={{fontSize:9,color:"var(--muted)",marginTop:2,fontWeight:600,letterSpacing:".02em",textTransform:"uppercase"}}>{l}</div>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8,marginBottom:14}}>
+          {[["🔥",s.streak,"Streak","#FFF3EC","#E85D20"],["⚡",fmtXP(s.xp),"XP","#FFFBEB","#F59E0B"],["🏆",s.challengesWon,"Won","#EFF6FF","#1A4FD6"],["📥",fmtXP(s.noteDownloads),"DLs","#F5F3FF","#7C3AED"]].map(([em,n,l,bg,col])=>(
+            <div key={l} style={{background:bg,borderRadius:14,padding:"12px 4px",textAlign:"center",border:`1px solid ${col}22`,boxShadow:"0 2px 6px rgba(15,28,63,.05)"}}>
+              <div style={{fontSize:18,marginBottom:2}}>{em}</div>
+              <div style={{fontFamily:"'JetBrains Mono',monospace",fontWeight:900,fontSize:15,color:col}}>{n}</div>
+              <div style={{fontSize:9,color:"var(--muted)",marginTop:2,fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>{l}</div>
             </div>
           ))}
         </div>
-      </div>{/* end avatar row container */}
 
-      <div style={{maxWidth:600,margin:"0 auto",padding:"0 16px 90px"}}>
-        {/* Goal card */}
-        <div className="card" style={{padding:"14px 16px",marginBottom:14,background:"linear-gradient(135deg,#0F1C3F,#1A3A8A)"}}>
-          <div style={{fontSize:9,fontWeight:700,color:"rgba(147,197,253,.9)",letterSpacing:".04em",marginBottom:5}}>🎯 GOAL</div>
-          <div style={{fontSize:13,fontWeight:800,color:"#FFFFFF",marginBottom:8}}>{s.goal}</div>
-          <div style={{height:4,borderRadius:2,background:"rgba(255,255,255,.15)",overflow:"hidden"}}>
-            <div style={{height:"100%",width:`${s.syllabusPct}%`,background:"linear-gradient(90deg,#60A5FA,#93C5FD)",borderRadius:2}}/>
+        {/* Progress bar */}
+        <div style={{borderRadius:16,background:"linear-gradient(135deg,#0D0F1A,#1A0A2E)",padding:"14px 16px",marginBottom:14,border:"1px solid rgba(255,255,255,.08)"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+            <span style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.4)",letterSpacing:".05em"}}>SYLLABUS PROGRESS</span>
+            <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:14,fontWeight:900,color:str?.color||"#1A4FD6"}}>{s.syllabusPct}%</span>
           </div>
-          <div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:10,color:"rgba(255,255,255,.4)"}}>
-            <span>{s.syllabusPct}% complete</span><span>{s.daysToExam} days left</span>
+          <div style={{position:"relative",height:8,borderRadius:4,background:"rgba(255,255,255,.08)",overflow:"visible",marginBottom:8}}>
+            <div style={{height:"100%",width:`${s.syllabusPct}%`,background:`linear-gradient(90deg,${str?.color||"#1A4FD6"},#7C3AED)`,borderRadius:4,boxShadow:`0 0 10px ${str?.color||"#1A4FD6"}88`}}/>
+            <div style={{position:"absolute",top:-2,left:`${nextMilestone}%`,transform:"translateX(-50%)",width:3,height:12,background:"#FFD580",borderRadius:2,boxShadow:"0 0 6px rgba(255,213,128,.8)"}}/>
+          </div>
+          <div style={{fontSize:11,fontWeight:700,color:"#fff",marginBottom:5}}>
+            {s.syllabusPct>=80?"🔥":s.syllabusPct>=60?"⚡":"📈"} {s.syllabusPct}% — Ahead of {aheadOf}% of students
+          </div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(255,213,128,.1)",borderRadius:8,padding:"5px 10px",border:"1px solid rgba(255,213,128,.2)"}}>
+            <span style={{fontSize:11}}>🎯</span>
+            <span style={{fontSize:10,fontWeight:700,color:"#FFD580"}}>Next: {nextMilestone}% — {chaptersLeft} chapter{chaptersLeft!==1?"s":""} left</span>
           </div>
         </div>
+
         {/* Skills */}
-        <div className="card" style={{padding:"14px 16px",marginBottom:14}}>
-          <div style={{fontWeight:700,fontSize:13,color:"var(--text)",marginBottom:10}}>Skills</div>
+        <div style={{padding:"14px 16px",borderRadius:18,background:"#fff",border:"1px solid var(--b1)",marginBottom:16,boxShadow:"0 2px 6px rgba(15,28,63,.05)"}}>
+          <div style={{fontWeight:800,fontSize:13,color:"var(--text)",marginBottom:12}}>Skills</div>
           {s.skillLevels.map(([sk,pct,col])=>(
-            <div key={sk} style={{marginBottom:9}}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:600,color:"var(--sub)"}}>{sk}</span><span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:col,fontWeight:700}}>{pct}%</span></div>
-              <div className="skill-bar"><div className="skill-fill" style={{width:`${pct}%`,background:col}}/></div>
+            <div key={sk} style={{marginBottom:10}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                <span style={{fontSize:12,fontWeight:600,color:"var(--sub)"}}>{sk}</span>
+                <span style={{fontFamily:"'JetBrains Mono',monospace",fontSize:11,color:col,fontWeight:700}}>{pct}%</span>
+              </div>
+              <div style={{height:5,borderRadius:3,background:"rgba(15,28,63,.08)",overflow:"hidden"}}>
+                <div style={{height:"100%",width:`${pct}%`,background:col,borderRadius:3,boxShadow:`0 0 8px ${col}66`}}/>
+              </div>
             </div>
           ))}
         </div>
-        {/* Tabs: Posts */}
-        <div style={{display:"flex",borderBottom:"1px solid var(--b1)",marginBottom:12}}>
+
+        {/* Tabs */}
+        <div style={{display:"flex",gap:2,background:"#E8ECF4",borderRadius:14,padding:4,marginBottom:16}}>
           {[["posts",`📝 Posts (${posts.length})`],["about","About"]].map(([k,l])=>(
-            <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"9px",background:"none",border:"none",borderBottom:tab===k?"2px solid var(--blue)":"2px solid transparent",color:tab===k?"var(--blue)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12}}>{l}</button>
+            <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"9px",borderRadius:11,background:tab===k?"#fff":"none",border:"none",color:tab===k?"var(--text)":"var(--muted)",fontWeight:tab===k?700:500,fontSize:12,transition:"all .18s"}}>{l}</button>
           ))}
         </div>
+
         {tab==="posts"&&(
           <div className="fi">
             {posts.length===0&&<div style={{textAlign:"center",padding:"30px 0",color:"var(--muted)",fontSize:12}}>No posts yet</div>}
             {posts.map(p=>(
-              <div key={p.id} className="card" style={{marginBottom:10,overflow:"hidden"}}>
+              <div key={p.id} style={{borderRadius:18,overflow:"hidden",marginBottom:10,background:"#fff",border:"1px solid var(--b1)",boxShadow:"0 2px 8px rgba(15,28,63,.05)"}}>
                 {p.imageUrl&&<img src={p.imageUrl} alt="" style={{width:"100%",height:140,objectFit:"cover",display:"block"}}/>}
-                <div style={{padding:"10px 13px"}}>
+                <div style={{padding:"12px 14px"}}>
                   <div style={{fontSize:10,color:"var(--muted)",marginBottom:4}}>{p.subject} · {p.time}</div>
-                  <p style={{fontSize:12,color:"var(--sub)",lineHeight:1.6,marginBottom:6}}>{p.text}</p>
-                  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:6}}>{p.tags.map(t=><span key={t} className="tag">{t}</span>)}</div>
+                  <p style={{fontSize:12,color:"var(--sub)",lineHeight:1.6,marginBottom:8}}>{p.text}</p>
+                  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:8}}>{p.tags.map(t=><span key={t} style={{fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:5,background:"#EEF2FF",color:"var(--blue)",border:"1px solid rgba(26,79,214,.15)",fontFamily:"'JetBrains Mono',monospace"}}>{t}</span>)}</div>
                   <div style={{display:"flex",gap:12,fontSize:11,color:"var(--muted)"}}>
-                    <span>❤️ {p.likes}</span><span>💬 {p.comments}</span><span>🔖 {p.saves}</span>
-                    <span style={{marginLeft:"auto"}}><XPTag xp={p.xp}/></span>
+                    <span>❤️ {p.likes>=1000?(p.likes/1000).toFixed(1)+"K":p.likes}</span>
+                    <span>💬 {p.comments>=1000?(p.comments/1000).toFixed(1)+"K":p.comments}</span>
+                    <span>🔖 {p.saves>=1000?(p.saves/1000).toFixed(1)+"K":p.saves}</span>
                   </div>
                 </div>
               </div>
@@ -1215,31 +2530,397 @@ function StudentProfile({studentId,onBack,onFollow,followed}) {
           </div>
         )}
         {tab==="about"&&(
-          <div className="fi card" style={{padding:"14px 16px"}}>
-            <div style={{display:"flex",flexDirection:"column",gap:10}}>
-              {[["📍","City",s.city],["🎯","Exam",s.exam],["📅","Streak",`${s.streak} days`],["⚡","Total XP",`${s.xp.toLocaleString()} XP`],["📥","Note Downloads",s.noteDownloads.toLocaleString()],["✅","Syllabus",`${s.syllabusPct}% done`]].map(([ic,l,v])=>(
-                <div key={l} style={{display:"flex",alignItems:"center",gap:10}}>
-                  <span style={{fontSize:16,width:26,textAlign:"center"}}>{ic}</span>
-                  <span style={{fontSize:12,color:"var(--muted)",minWidth:100}}>{l}</span>
-                  <span style={{fontSize:12,fontWeight:600,color:"var(--text)"}}>{v}</span>
+          <div className="fi" style={{padding:"16px",borderRadius:18,background:"#fff",border:"1px solid var(--b1)",boxShadow:"0 2px 8px rgba(15,28,63,.05)"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              {[["📍","City",s.city],["🎯","Exam",s.exam],["📅","Streak",`${s.streak} days`],["⚡","Total XP",`${s.xp.toLocaleString()} XP`],["📥","Downloads",s.noteDownloads.toLocaleString()],["✅","Syllabus",`${s.syllabusPct}% done`]].map(([ic,l,v])=>(
+                <div key={l} style={{display:"flex",alignItems:"center",gap:12}}>
+                  <span style={{fontSize:18,width:28,textAlign:"center"}}>{ic}</span>
+                  <span style={{fontSize:12,color:"var(--muted)",minWidth:90}}>{l}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:"var(--text)"}}>{v}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
+        <div style={{height:60}}/>
+      </div>
+
+      {/* Message / Invite Sheet */}
+      {showMsg&&(
+        <div onClick={()=>{setShowMsg(false);setSent(false);}} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:300,display:"flex",alignItems:"flex-end",animation:"fadeIn .2s"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:600,margin:"0 auto",background:"#fff",borderRadius:"24px 24px 0 0",padding:"20px 20px 40px",animation:"slideUp .3s ease"}}>
+            {sent?(
+              <div style={{textAlign:"center",padding:"20px 0"}}>
+                <div style={{fontSize:48,marginBottom:12}}>🎉</div>
+                <div style={{fontSize:18,fontWeight:900,color:"var(--text)",marginBottom:6}}>Message Sent!</div>
+                <div style={{fontSize:13,color:"var(--muted)",marginBottom:20}}>{firstName} will see your message and can accept your study invite.</div>
+                <button onClick={()=>{setShowMsg(false);setSent(false);}} style={{padding:"12px 32px",borderRadius:50,background:"linear-gradient(135deg,#1A4FD6,#7C3AED)",border:"none",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>Done ✓</button>
+              </div>
+            ):(
+              <>
+                {/* Header */}
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+                  <div style={{display:"flex",alignItems:"center",gap:10}}>
+                    <img src={s.avatar} width={40} height={40} alt="" style={{borderRadius:"50%",border:"2px solid var(--b2)"}}/>
+                    <div>
+                      <div style={{fontWeight:800,fontSize:15,color:"var(--text)"}}>{isFollowed?`Message ${firstName}`:`Study Invite to ${firstName}`}</div>
+                      <div style={{fontSize:11,color:"var(--muted)"}}>{isFollowed?"Send a direct message":"They'll get a request to connect"}</div>
+                    </div>
+                  </div>
+                  <button onClick={()=>setShowMsg(false)} style={{background:"#F4F7FD",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:16,color:"#888"}}>✕</button>
+                </div>
+
+                {/* If not followed — show invite templates */}
+                {!isFollowed&&(
+                  <div style={{marginBottom:14}}>
+                    <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",letterSpacing:".04em",marginBottom:8}}>✨ PERSONALISED TEMPLATES</div>
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      {inviteMsgs.map((msg,i)=>(
+                        <button key={i} onClick={()=>{setSelectedMsg(i);setCustomMsg("");}}
+                          style={{padding:"10px 12px",borderRadius:12,background:selectedMsg===i&&!customMsg?"linear-gradient(135deg,rgba(26,79,214,.08),rgba(124,58,237,.08))":"#F8FAFD",border:selectedMsg===i&&!customMsg?"1.5px solid rgba(26,79,214,.3)":"1.5px solid var(--b1)",textAlign:"left",fontSize:12,color:"var(--text)",cursor:"pointer",lineHeight:1.5,fontWeight:selectedMsg===i&&!customMsg?600:400}}>
+                          {msg}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Custom message input */}
+                <div style={{marginBottom:14}}>
+                  <div style={{fontSize:11,fontWeight:700,color:"var(--muted)",letterSpacing:".04em",marginBottom:6}}>{isFollowed?"MESSAGE":"OR WRITE YOUR OWN"}</div>
+                  <textarea
+                    value={customMsg||(!isFollowed?inviteMsgs[selectedMsg]:"")}
+                    onChange={e=>setCustomMsg(e.target.value)}
+                    placeholder={isFollowed?`Write a message to ${firstName}...`:"Customise your invite..."}
+                    style={{width:"100%",padding:"12px 14px",borderRadius:14,border:"1.5px solid var(--b2)",fontSize:13,color:"var(--text)",outline:"none",background:"#F8FAFD",resize:"none",height:90,fontFamily:"inherit",boxSizing:"border-box",lineHeight:1.5}}
+                  />
+                </div>
+
+                {/* Send button */}
+                <button onClick={()=>setSent(true)}
+                  style={{width:"100%",padding:"14px",borderRadius:50,background:"linear-gradient(135deg,#1A4FD6,#7C3AED)",border:"none",color:"#fff",fontWeight:800,fontSize:14,cursor:"pointer",boxShadow:"0 4px 16px rgba(26,79,214,.35)"}}>
+                  {isFollowed?"Send Message 💬":"Send Study Invite 💌"}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Initial Comments per Post (real users, real content) ──────────────────────
+const INIT_POST_COMMENTS = {
+  1:[
+    {id:101,studentId:8, name:"Kavya Reddy",  avatar:ALL_AVATARS[7],  text:"p53 is SO important for NEET — saw it in 3 questions last year's paper! 🔥",           time:"45m ago", likes:18, liked:false},
+    {id:102,studentId:2, name:"Neha Gupta",   avatar:ALL_AVATARS[1],  text:"Wait so it's technically a transcription factor not an enzyme? That's a classic NCERT trap 😭", time:"30m ago", likes:9, liked:false},
+    {id:103,studentId:5, name:"Simran Kaur",  avatar:ALL_AVATARS[4],  text:"Bookmarking this. My bio teacher never explained it this clearly.", time:"12m ago", likes:6, liked:false},
+  ],
+  2:[
+    {id:201,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"This exact question came in JEE Mains 2023 Session 2! 🎯", time:"1h ago", likes:34, liked:false},
+    {id:202,studentId:10,name:"Dev Patel",     avatar:ALL_AVATARS[9],  text:"Energy conservation questions are my weakness — saving this derivation", time:"50m ago", likes:11, liked:false},
+    {id:203,studentId:14,name:"Karan Bhatia",  avatar:ALL_AVATARS[13], text:"h/4 caught me off guard the first time. Thanks for the step-by-step!", time:"20m ago", likes:5, liked:false},
+  ],
+  3:[
+    {id:301,studentId:1, name:"Priya Menon",  avatar:ALL_AVATARS[0],  text:"CF₃COOH was in NEET 2022! Fluorine's electronegativity = key concept 💪", time:"2h ago", likes:22, liked:false},
+    {id:302,studentId:9, name:"Tanvi Shah",   avatar:ALL_AVATARS[8],  text:"Finally someone explains this properly instead of just giving the answer 🙏", time:"1h ago", likes:15, liked:false},
+    {id:303,studentId:13,name:"Shriya Agarwal",avatar:ALL_AVATARS[12], text:"Inductive effect clarity: EN ∝ electron withdrawal ∝ acid strength. Got it!", time:"30m ago", likes:8, liked:false},
+  ],
+  4:[
+    {id:401,studentId:6, name:"Rohan Desai",  avatar:ALL_AVATARS[5],  text:"Python loop variable scoping is a nightmare for beginners 😂 great question!", time:"3h ago", likes:19, liked:false},
+    {id:402,studentId:18,name:"Siddharth Joshi",avatar:ALL_AVATARS[17],text:"This is literally an Amazon SDE interview question I got last month 😅",         time:"2h ago", likes:27, liked:false},
+  ],
+  5:[
+    {id:501,studentId:2, name:"Neha Gupta",   avatar:ALL_AVATARS[1],  text:"720/720!!! This is insane. What mock test series were you using?? 🤯",   time:"4h ago", likes:89, liked:false},
+    {id:502,studentId:8, name:"Kavya Reddy",  avatar:ALL_AVATARS[7],  text:"The schedule is 🔥 Stealing this for the next 48 days. Thank you Priya!",  time:"3h ago", likes:67, liked:false},
+    {id:503,studentId:5, name:"Simran Kaur",  avatar:ALL_AVATARS[4],  text:"This post just gave me the push I needed at 2am. Not sleeping. Opening Bio notes.", time:"2h ago", likes:45, liked:false},
+    {id:504,studentId:13,name:"Shriya Agarwal",avatar:ALL_AVATARS[12], text:"Following for more motivation posts. The weekly breakdown is gold 🥇",   time:"1h ago", likes:31, liked:false},
+  ],
+  6:[
+    {id:601,studentId:1, name:"Priya Menon",  avatar:ALL_AVATARS[0],  text:"Day 61-88 feels automatic — YES. That's exactly what happened to me too!", time:"5h ago", likes:41, liked:false},
+    {id:602,studentId:15,name:"Meera Pillai", avatar:ALL_AVATARS[14], text:"Current streak: 73 days. Day 31-60 phase almost destroyed me 😭 pushing through!", time:"3h ago", likes:28, liked:false},
+    {id:603,studentId:7, name:"Arjun Nair",   avatar:ALL_AVATARS[6],  text:"My streak: 21 days. You just gave me motivation to reach 88. Thank you 🙏", time:"1h ago", likes:14, liked:false},
+  ],
+  7:[
+    {id:701,studentId:12,name:"Aditya Kumar",  avatar:ALL_AVATARS[11], text:"This motivation post hit different at 2am before my mock 😭 thank you 🙏", time:"3h ago", likes:56, liked:false},
+    {id:702,studentId:19,name:"Riya Joshi",    avatar:ALL_AVATARS[18], text:"Day 142 here — it DOES get automatic. You've got this bestie 💪", time:"2h ago", likes:43, liked:false},
+    {id:703,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"Cried after my mock too. 61%. This post literally saved my night 🤝", time:"1h ago", likes:29, liked:false},
+  ],
+  8:[
+    {id:801,studentId:11,name:"Ananya Singh",  avatar:ALL_AVATARS[10], text:"The JEE win challenge saga is so inspiring — congrats on the internship!! 🎉", time:"6h ago", likes:38, liked:false},
+    {id:802,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"Which company? This is huge motivation for all of us coding track students 🔥", time:"4h ago", likes:22, liked:false},
+    {id:803,studentId:17,name:"Vikram Nair",   avatar:ALL_AVATARS[16], text:"Challenge mode unlocked. Starting my submission tonight!", time:"2h ago", likes:18, liked:false},
+  ],
+  9:[
+    {id:901,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"DNA replication questions are 5-6 marks in NEET every year. This is gold 🧬", time:"8h ago", likes:31, liked:false},
+    {id:902,studentId:20,name:"Pooja Sharma",  avatar:ALL_AVATARS[19], text:"Semi-conservative replication was SO confusing until I read this 💡", time:"5h ago", likes:19, liked:false},
+    {id:903,studentId:16,name:"Sana Sheikh",   avatar:ALL_AVATARS[15], text:"Meselson-Stahl experiment explanation is perfect here. Saving this forever 📌", time:"2h ago", likes:12, liked:false},
+  ],
+  10:[
+    {id:1001,studentId:8, name:"Kavya Reddy",  avatar:ALL_AVATARS[7],  text:"GOC resonance at 11pm was my villain origin story 😂 this helps so much", time:"10h ago", likes:24, liked:false},
+    {id:1002,studentId:14,name:"Karan Bhatia", avatar:ALL_AVATARS[13], text:"Mesomeric effect > inductive effect in resonance — that clarity is 🔥", time:"7h ago", likes:17, liked:false},
+    {id:1003,studentId:9, name:"Tanvi Shah",   avatar:ALL_AVATARS[8],  text:"Can you do one on hyperconjugation next? Always mix them up!", time:"3h ago", likes:9, liked:false},
+  ],
+  11:[
+    {id:1101,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"Hardy-Weinberg is literally 4-5 marks in NEET every year. Saving this 🧬", time:"1d ago", likes:31, liked:false},
+    {id:1102,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"The banana DNA fact just ended me 🍌😭 sharing this with everyone", time:"22h ago", likes:19, liked:false},
+    {id:1103,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"Miller-Urey explanation is spot on. This is how NCERT wants you to think about it 💯", time:"18h ago", likes:14, liked:false},
+  ],
+  12:[
+    {id:1201,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"InOrder = LNR not LRN — I always mix this up. The alphabetical trick is genius 🤯", time:"1d ago", likes:28, liked:false},
+    {id:1202,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"Can you do graphs next? BFS vs DFS always confuses me", time:"20h ago", likes:17, liked:false},
+    {id:1203,studentId:15,name:"Meera Pillai",  avatar:ALL_AVATARS[14], text:"30-second test done ✅ Got it! The mnemonic is GOATED", time:"14h ago", likes:11, liked:false},
+  ],
+  13:[
+    {id:1301,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"January → March arc is TOO real 😭 crying but also motivated somehow", time:"2d ago", likes:89, liked:false},
+    {id:1302,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"Day 34 AND you're already reflecting like this? You're going to be fine 💪", time:"2d ago", likes:67, liked:false},
+    {id:1303,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"'The students who make it aren't the smartest' — printing this and sticking it to my wall", time:"1d ago", likes:52, liked:false},
+  ],
+  14:[
+    {id:1401,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"'I think I understand Genetics' → fails every Hardy-Weinberg' 💀 this is me every single time", time:"2d ago", likes:112, liked:false},
+    {id:1402,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"My revision tip: solve previous year papers before finishing the chapter. Forces you to see gaps 🔥", time:"2d ago", likes:78, liked:false},
+    {id:1403,studentId:15,name:"Meera Pillai",  avatar:ALL_AVATARS[14], text:"'One more mock and I'm done' currently on mock 4 😭 story of my life", time:"1d ago", likes:61, liked:false},
+  ],
+  15:[
+    {id:1501,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"🙋 Day 29 solidarity from Day 47. It DOES get clearer. Keep going!", time:"2d ago", likes:67, liked:false},
+    {id:1502,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"🙋 Day 21 here. The 'feeling dumb' phase is so real. Thank you for posting this", time:"2d ago", likes:43, liked:false},
+    {id:1503,studentId:11,name:"Ananya Singh",  avatar:ALL_AVATARS[10], text:"Stop comparing your chapter 1 to someone's chapter 20 — this advice is literally gold 🥇", time:"1d ago", likes:38, liked:false},
+  ],
+  16:[
+    {id:1601,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"3-2-1 method literally changed my retention. I use it for everything now. Bio score went from 71% to 89%!", time:"2d ago", likes:94, liked:false},
+    {id:1602,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"'MCQs expose gaps; reading creates false confidence' — this sentence deserves its own post 🔥", time:"2d ago", likes:71, liked:false},
+    {id:1603,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"I struggle most with Genetics numericals. Any tips specifically for Hardy-Weinberg calc?", time:"1d ago", likes:29, liked:false},
+  ],
+  17:[
+    {id:1701,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"'No studying after 9pm' is underrated. I used to study till midnight and retained nothing 😭", time:"3d ago", likes:87, liked:false},
+    {id:1702,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"The 30 min walk is non-negotiable for me too. Brain genuinely works better after it 💯", time:"3d ago", likes:64, liked:false},
+    {id:1703,studentId:9, name:"Tanvi Shah",    avatar:ALL_AVATARS[8],  text:"Mistake analysis at 5pm is the move. That hour made my score jump 12% in one month", time:"2d ago", likes:48, liked:false},
+  ],
+  18:[
+    {id:1801,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"FINALLY someone explains it with the LOGIC not just the diagram. Krebs clicked for me just now 🧠", time:"3d ago", likes:54, liked:false},
+    {id:1802,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"1 turn = 2CO₂, 3NADH, 1FADH₂, 1GTP — screenshot saved. This is the cleanest summary I've seen", time:"3d ago", likes:39, liked:false},
+    {id:1803,studentId:11,name:"Ananya Singh",  avatar:ALL_AVATARS[10], text:"Drawn from memory ✅ Actually worked! The visual logic approach > rote memorisation always", time:"2d ago", likes:27, liked:false},
+  ],
+  19:[
+    {id:1901,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"JEE 2023 Session 2 had this EXACT form! You're not wrong, this literally saved me 90 seconds 🙏", time:"3d ago", likes:67, liked:false},
+    {id:1902,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"e^[lim(f(x)-1)·g(x)] form — I've been doing L'Hopital on every 1^∞ like a fool 😭", time:"3d ago", likes:51, liked:false},
+    {id:1903,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"Bro saved my Maths paper with this one post. Grateful 🤝", time:"2d ago", likes:38, liked:false},
+  ],
+  20:[
+    {id:2001,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"🤝 I needed this. Scoring 58% on mocks and feeling like giving up. Thank you Simran 💙", time:"4d ago", likes:178, liked:false},
+    {id:2002,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"🤝 Cried after 61% mock last week. You're not alone. The bounce back is always worth it 💪", time:"4d ago", likes:134, liked:false},
+    {id:2003,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"🤝 Day 34 here. Scored 49% today. Opened this post. Feel slightly less like quitting. Thank you.", time:"3d ago", likes:98, liked:false},
+  ],
+  21:[
+    {id:2101,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"Got it right! Endosymbiont theory = mitochondria + chloroplast have their own DNA 🧬", time:"4d ago", likes:54, liked:false},
+    {id:2102,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"I said C thinking 'mitochondria is membrane-bound' — the trap got me 😭 never again", time:"4d ago", likes:38, liked:false},
+    {id:2103,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"NEET 2022 question!! You just saved me from losing 4 marks in 2026. Thank you 🙏", time:"3d ago", likes:29, liked:false},
+  ],
+  22:[
+    {id:2201,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"C — got it right! The perpendicular force trick is so clean once you understand it", time:"4d ago", likes:49, liked:false},
+    {id:2202,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"I said D thinking 'it depends on charge sign' — thank you for the explanation 😭", time:"4d ago", likes:33, liked:false},
+    {id:2203,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"Work = F·d·cos90° = 0. So simple, so beautiful, so many people get it wrong 💀", time:"3d ago", likes:27, liked:false},
+  ],
+  23:[
+    {id:2301,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"#6 is a legit NEET trap every year. Cornea = no blood supply. Saving this forever 📌", time:"5d ago", likes:112, liked:false},
+    {id:2302,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"The banana DNA one ended me. 50% shared with a banana. My crisis is complete 🍌😭", time:"5d ago", likes:89, liked:false},
+    {id:2303,studentId:9, name:"Tanvi Shah",    avatar:ALL_AVATARS[8],  text:"Neurons at 432 km/h but I still can't think fast enough in the exam hall 💀", time:"4d ago", likes:67, liked:false},
+  ],
+  24:[
+    {id:2401,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"The photon taking 100,000 years to leave the Sun's core broke my brain 🤯", time:"5d ago", likes:89, liked:false},
+    {id:2402,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"'Physics isn't hard, it's WEIRD' — this framing changed how I study it completely 🙏", time:"5d ago", likes:63, liked:false},
+    {id:2403,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"Heisenberg uncertainty principle post would be amazing. Please make one!", time:"4d ago", likes:47, liked:false},
+  ],
+  25:[
+    {id:2501,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"282 hours of JEE prep. That number is incredible. This is the post I needed today 🔥", time:"5d ago", likes:78, liked:false},
+    {id:2502,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"Honest update from me: Day 21, avg 4.8 hrs/day = 100 hours. It's real. It's mine. 💪", time:"5d ago", likes:54, liked:false},
+    {id:2503,studentId:15,name:"Meera Pillai",  avatar:ALL_AVATARS[14], text:"Day 104. Was targeting 14hrs. Averaging 9.2. Still way more than I ever did before prep. Progress is progress 🙏", time:"4d ago", likes:43, liked:false},
+  ],
+  26:[
+    {id:2601,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"📥 (Also sharing with 3 friends in my study group right now. Legend move Kavya 💙)", time:"6d ago", likes:234, liked:false},
+    {id:2602,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"📥 Day 21, can barely afford textbooks. This means everything. Thank you from the bottom of my heart 🙏", time:"6d ago", likes:187, liked:false},
+    {id:2603,studentId:15,name:"Meera Pillai",  avatar:ALL_AVATARS[14], text:"📥 Downloaded AND shared with 5 students in my city who can't afford coaching. Kavya you're a hero 💙", time:"5d ago", likes:156, liked:false},
+  ],
+  27:[
+    {id:2701,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"B — got it! The trick is: both statements can be true but R still doesn't explain A correctly 💡", time:"6d ago", likes:67, liked:false},
+    {id:2702,studentId:9, name:"Tanvi Shah",    avatar:ALL_AVATARS[8],  text:"Assertion-Reason questions are free marks once you understand the format. This breakdown is perfect 🎯", time:"6d ago", likes:49, liked:false},
+    {id:2703,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"I always panic on A-R questions. Bookmarking this logic pattern. Never losing these 4 marks again!", time:"5d ago", likes:38, liked:false},
+  ],
+  28:[
+    {id:2801,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"4/5 — got the bleaching powder formula wrong 😭 Ca(OCl)Cl not CaOCl₂. Never again!", time:"1w ago", likes:54, liked:false},
+    {id:2802,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"5/5 ✅ The Cu(NH₃)₄ deep blue one is a NEET classic. Good prep everyone!", time:"1w ago", likes:41, liked:false},
+    {id:2803,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"3/5 😭 Need to go back to p-block elements. Thanks for the reality check!", time:"6d ago", likes:28, liked:false},
+  ],
+  29:[
+    {id:2901,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"CAM plants open stomata at night — I knew this but never understood WHY until now. Thank you! 🌵", time:"1w ago", likes:58, liked:false},
+    {id:2902,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"Compensation point concept is underrated. Came in NEET 2021 and will come again 🎯", time:"1w ago", likes:43, liked:false},
+    {id:2903,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"'Net gas exchange = ZERO at compensation point' — writing this on my wall 📌", time:"6d ago", likes:31, liked:false},
+  ],
+  30:[
+    {id:3001,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"The cricket stadium explanation made Doppler click instantly. Finally! 🏏", time:"1w ago", likes:52, liked:false},
+    {id:3002,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"Redshift = Doppler for light = universe expanding. Same physics, different scale. Mind = blown 🌌", time:"1w ago", likes:38, liked:false},
+    {id:3003,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"The + for numerator when observer moves TOWARDS source trick is gold. Saving this!", time:"6d ago", likes:27, liked:false},
+  ],
+  31:[
+    {id:3101,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"'I stopped memorising the formula and derived it from F=ma' — THIS is real physics 🔥", time:"1w ago", likes:89, liked:false},
+    {id:3102,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"Day 34 here. Day 21 Arjun is going to be fine. I can feel it from this post 💪", time:"1w ago", likes:61, liked:false},
+    {id:3103,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"sin2θ max at 2θ=90° so θ=45°. I've been told the answer a hundred times but never seen the WHY. Thank you! 💡", time:"6d ago", likes:47, liked:false},
+  ],
+  32:[
+    {id:3201,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"'Failing a mock is data, not destiny' — best thing I've read all week 💙", time:"1w ago", likes:134, liked:false},
+    {id:3202,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"Exceptions Notebook is REAL. I have one and it's saved me so many marks. Do it!", time:"1w ago", likes:98, liked:false},
+    {id:3203,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"Anhydrous CoCl₂ blue, hydrated pink — humidity indicator question comes every year! Good catch 🎯", time:"6d ago", likes:74, liked:false},
+  ],
+  33:[
+    {id:3301,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"You SHIPPED IT! Zero to React in 6 weeks to NVIDIA submission is insane. Rooting for you 🚀", time:"1w ago", likes:112, liked:false},
+    {id:3302,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"'Whether I win or not — I built something real' — this mindset is going to take you far 🔥", time:"1w ago", likes:89, liked:false},
+    {id:3303,studentId:2, name:"Neha Gupta",    avatar:ALL_AVATARS[1],  text:"Top 10% of 312 students gets an interview. You've already won by shipping. Proud of you!", time:"6d ago", likes:67, liked:false},
+  ],
+  34:[
+    {id:3401,studentId:3, name:"Ishaan Verma",  avatar:ALL_AVATARS[2],  text:"5/5 ✅ The water vapour greenhouse one is THE classic NEET trap. Caught me in 2023 mock!", time:"2w ago", likes:98, liked:false},
+    {id:3402,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"4/5 — said CO₂ for greenhouse 😭 every single time. Printing this and putting it on my wall", time:"2w ago", likes:76, liked:false},
+    {id:3403,studentId:9, name:"Tanvi Shah",    avatar:ALL_AVATARS[8],  text:"3/5 — ATP full form embarrassingly blanked on. That's what panic does 💀 practicing now!", time:"2w ago", likes:54, liked:false},
+  ],
+  35:[
+    {id:3501,studentId:4, name:"Aarav Sharma",  avatar:ALL_AVATARS[3],  text:"i^i = real number = 0.2079 and I'm supposed to just accept this and move on? 🤯", time:"2w ago", likes:87, liked:false},
+    {id:3502,studentId:6, name:"Rohan Desai",   avatar:ALL_AVATARS[5],  text:"Euler's formula is in JEE Complex Numbers syllabus and this shows exactly why it matters. Bookmarked! 📌", time:"2w ago", likes:64, liked:false},
+    {id:3503,studentId:7, name:"Arjun Nair",    avatar:ALL_AVATARS[6],  text:"Mathematics is the most insane subject. Agreed 100%. This proof is beautiful 🤝", time:"2w ago", likes:48, liked:false},
+  ],
+  36:[
+    {id:3601,studentId:8, name:"Kavya Reddy",   avatar:ALL_AVATARS[7],  text:"'NCERT read 4+ times' is not an exaggeration. It is literally the secret. Screenshot this everyone 📸", time:"2w ago", likes:156, liked:false},
+    {id:3602,studentId:1, name:"Priya Menon",   avatar:ALL_AVATARS[0],  text:"'Most organisms' for DNA is the trap — viruses use RNA! One word difference = 4 marks 🔥", time:"2w ago", likes:112, liked:false},
+    {id:3603,studentId:5, name:"Simran Kaur",   avatar:ALL_AVATARS[4],  text:"I'm on my 3rd NCERT read. Can confirm: noticing things I never saw before each time. Keep going everyone 💙", time:"2w ago", likes:87, liked:false},
+  ],
+};
+
+
+// ─── PostCard ─────────────────────────────────────────────────────────────────
+function PostCard({p,liked,setLiked,saved,toggleSave,reposted,toggleRepost,followed,toggleFollow,setCommentPost,setSharePost,postComments,sendCounts,addSend,onViewProfile}) {
+  const s=STUDENTS.find(st=>st.id===p.studentId)||{};
+  const isLiked=liked.includes(p._key);
+  const isSaved=saved.includes(p._key);
+  const isReposted=reposted.includes(p._key);
+  const isFollowed=followed.includes(p.studentId);
+  const allComments=[...(INIT_POST_COMMENTS[p.id]||[]),...(postComments[p.id]||[])];
+  const likeCount=p.likes+(isLiked?1:0);
+  const userAdded=(postComments[p.id]||[]).length;
+  const commentCount=p.comments+userAdded;
+  const saveCount=p.saves+(isSaved?1:0);
+  const repostCount=(p.reposts||Math.floor(p.likes/8))+(isReposted?1:0);
+  const sendCount=(p.sends||Math.floor(p.likes/12))+(sendCounts?.[p._key]||0);
+  const fmtNum=n=>n>=1000?(n/1000).toFixed(1)+"K":n.toLocaleString();
+  const MAX=160;
+  const isLong=p.text.length>MAX;
+  const [expanded,setExpanded]=useState(false);
+  return (
+    <div style={{background:"#fff",marginBottom:8,borderRadius:16,border:"1px solid #E8ECF2",boxShadow:"0 1px 6px rgba(15,28,63,.06)",overflow:"hidden",margin:"0 14px 8px"}}>
+      {/* Header */}
+      <div style={{display:"flex",alignItems:"flex-start",gap:10,padding:"12px 14px 8px"}}>
+        <div style={{cursor:"pointer",flexShrink:0}} onClick={()=>onViewProfile(p.studentId)}>
+          <Av src={p.avatar} size={42} ring={STREAM[p.stream]?.color} online={p.studentId===1} verified={s.verified}/>
+        </div>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:6}}>
+            <div style={{cursor:"pointer",minWidth:0}} onClick={()=>onViewProfile(p.studentId)}>
+              <div style={{fontWeight:700,fontSize:13,color:"var(--text)",display:"flex",alignItems:"center",gap:5,flexWrap:"wrap"}}>
+                {p.name}{s.verified&&<span style={{color:"#0A9B6A",fontSize:12}}>✔</span>}
+                <span style={{fontSize:11,color:"var(--muted)",fontWeight:400}}>· 2nd</span>
+              </div>
+              <div style={{fontSize:11,color:"var(--muted)",marginTop:1}}>{p.subject}</div>
+              <div style={{fontSize:10,color:"#bbb",marginTop:1}}>{p.time} · 🌐</div>
+            </div>
+            <button onClick={()=>toggleFollow(p.studentId)} style={{padding:"5px 14px",borderRadius:20,background:"none",border:isFollowed?"none":"1.5px solid var(--blue)",color:isFollowed?"var(--muted)":"var(--blue)",fontSize:12,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
+              {isFollowed?"Following":"+ Follow"}
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Text */}
+      <div style={{padding:"0 14px 8px"}}>
+        <div style={{fontSize:13,lineHeight:1.65,color:"#1A1A2E"}}>
+          {expanded||!isLong?p.text:p.text.slice(0,MAX)+"…"}
+        </div>
+        {isLong&&<button onClick={()=>setExpanded(e=>!e)} style={{background:"none",border:"none",padding:0,color:"var(--muted)",fontSize:13,fontWeight:600,cursor:"pointer",marginTop:2}}>{expanded?" show less":"...more"}</button>}
+        <div style={{display:"flex",gap:4,flexWrap:"wrap",marginTop:7}}>{p.tags.map(t=><span key={t} className="tag">{t}</span>)}</div>
+      </div>
+      {/* Image */}
+      {p.imageUrl&&(
+        <div style={{position:"relative"}}>
+          <img src={p.imageUrl} alt="" style={{width:"100%",height:220,objectFit:"cover",display:"block"}}/>
+          <div style={{position:"absolute",top:9,left:10,display:"flex",gap:5}}>
+            {p.day&&<span style={{background:"rgba(0,0,0,.5)",backdropFilter:"blur(6px)",color:"#FFD580",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:50}}>🔥 {p.day}</span>}
+            {p.hours>0&&<span style={{background:"rgba(0,0,0,.5)",backdropFilter:"blur(6px)",color:"#6EE8B4",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:50}}>⏱ {p.hours}h</span>}
+          </div>
+          {p.xp>0&&<div style={{position:"absolute",top:9,right:10}}><XPTag xp={p.xp}/></div>}
+        </div>
+      )}
+      {/* Stats line */}
+      <div style={{padding:"8px 14px 0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:5}}>
+          <div style={{display:"flex"}}>
+            {[0,1].map(i=><img key={i} src={STUDENTS[(p.studentId+i)%STUDENTS.length].avatar} width={18} height={18} alt="" style={{borderRadius:"50%",border:"1.5px solid #fff",marginLeft:i===0?0:-5,display:"block"}}/>)}
+          </div>
+          <span style={{fontSize:12,color:"#888"}}>{fmtNum(likeCount)} likes</span>
+        </div>
+        <div style={{display:"flex",gap:10,fontSize:12,color:"#888"}}>
+          <button onClick={()=>setCommentPost(p)} style={{background:"none",border:"none",padding:0,color:"#888",fontSize:12,cursor:"pointer"}}>{fmtNum(commentCount)} comments</button>
+          <span>·</span>
+          <span>{fmtNum(repostCount)} reposts</span>
+          <span>·</span>
+          <span>{fmtNum(sendCount)} sends</span>
+          <span>·</span>
+          <span>{fmtNum(saveCount)} saves</span>
+        </div>
+      </div>
+      {/* Action bar */}
+      <div style={{display:"flex",borderTop:"1px solid #E8ECF2",margin:"6px 0 0",padding:"2px 0"}}>
+        {/* Like */}
+        <button onClick={()=>setLiked(l=>l.includes(p._key)?l.filter(x=>x!==p._key):[...l,p._key])} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",padding:"8px 4px",cursor:"pointer"}}>
+          {isLiked?<svg width="18" height="18" viewBox="0 0 24 24" fill="#E0245E" stroke="#E0245E" strokeWidth="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          :<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+          <span style={{fontSize:11,fontWeight:600,color:isLiked?"#E0245E":"#555"}}>Like</span>
+        </button>
+        {/* Comment */}
+        <button onClick={()=>setCommentPost(p)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",padding:"8px 4px",cursor:"pointer"}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span style={{fontSize:11,fontWeight:600,color:"#555"}}>Comment</span>
+        </button>
+        {/* Repost */}
+        <button onClick={()=>toggleRepost(p._key)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",padding:"8px 4px",cursor:"pointer"}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isReposted?"#0A9B6A":"#555"} strokeWidth="1.8" strokeLinecap="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          <span style={{fontSize:11,fontWeight:600,color:isReposted?"#0A9B6A":"#555"}}>Repost</span>
+        </button>
+        {/* Send */}
+        <button onClick={()=>{setSharePost(p);addSend&&addSend(p._key);}} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",padding:"8px 4px",cursor:"pointer"}}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          <span style={{fontSize:11,fontWeight:600,color:"#555"}}>Send</span>
+        </button>
+        {/* Save */}
+        <button onClick={()=>toggleSave(p._key)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,background:"none",border:"none",padding:"8px 4px",cursor:"pointer"}}>
+          {isSaved?<svg width="18" height="18" viewBox="0 0 24 24" fill="#1A4FD6" stroke="#1A4FD6" strokeWidth="1.8" strokeLinecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          :<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="1.8" strokeLinecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>}
+          <span style={{fontSize:11,fontWeight:600,color:isSaved?"#1A4FD6":"#555"}}>Save</span>
+        </button>
       </div>
     </div>
   );
 }
 
 // ─── Feed ─────────────────────────────────────────────────────────────────────
-function Feed({onNav,user,notifs,notifCount,onMarkAllRead,challenges,submissions,onViewProfile,followed,onFollow}) {
+function Feed({onNav,user,notifs,notifCount,onMarkAllRead,challenges,submissions,onViewProfile,followed,onFollow,onPost}) {
   const [showNotifs,setShowNotifs]=useState(false);
   const [liked,setLiked]=useState([]);
   const [commentPost,setCommentPost]=useState(null);
   const [sharePost,setSharePost]=useState(null);
   const [postComments,setPostComments]=useState({});
+  const [saved,setSaved]=useState([]);
+  const [reposted,setReposted]=useState([]);
+  const [sendCounts,setSendCounts]=useState({});
+  const toggleSave=key=>setSaved(s=>s.includes(key)?s.filter(x=>x!==key):[...s,key]);
+  const toggleRepost=key=>setReposted(s=>s.includes(key)?s.filter(x=>x!==key):[...s,key]);
   const addComment=(postId,c)=>setPostComments(p=>({...p,[postId]:[...(p[postId]||[]),c]}));
+  const addSend=key=>setSendCounts(s=>({...s,[key]:(s[key]||0)+1}));
   const toggleFollow=id=>onFollow(id);
   // Infinite shuffled feed — Instagram-style random every time
   const shuffle=arr=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
@@ -1282,188 +2963,201 @@ function Feed({onNav,user,notifs,notifCount,onMarkAllRead,challenges,submissions
 
   return (
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
-      {showNotifs&&<NotifPanel notifs={notifs} onClose={()=>setShowNotifs(false)} onMarkAllRead={()=>{onMarkAllRead();setShowNotifs(false);}}/>}
-      <CompanyTicker/>
       <div style={{background:"rgba(255,255,255,.97)",padding:"12px 15px",position:"sticky",top:0,zIndex:100,backdropFilter:"blur(20px)",borderBottom:"1px solid var(--b1)"}}>
         <div style={{maxWidth:600,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
-          <div style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}} onClick={()=>onViewProfile(user.id)}>
-            <Av src={user.avatar} size={38} ring="#60A5FA" online/>
-            <div><div style={{fontSize:10,color:"var(--muted)"}}>Hello 🌟</div><div style={{fontSize:15,fontWeight:800,color:"var(--text)",letterSpacing:"-.02em"}}>{user.name}</div></div>
+          <div style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{width:34,height:34,borderRadius:10,background:"linear-gradient(135deg,#1A4FD6,#7C3AED)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><svg width="20" height="12" viewBox="0 0 40 24" fill="none"><path d="M20 12C20 12 14 4 8 4C2 4 2 20 8 20C14 20 20 12 20 12Z" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/><path d="M20 12C20 12 26 4 32 4C38 4 38 20 32 20C26 20 20 12 20 12Z" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg></div>
+            <div>
+              <div style={{fontSize:17,fontWeight:900,color:"var(--text)",letterSpacing:"-.03em",lineHeight:1}}>Infinity</div>
+              <div style={{fontSize:10,color:"var(--muted)",fontWeight:600,letterSpacing:".04em"}}>STUDY · BUILD · WIN</div>
+            </div>
           </div>
           <div style={{display:"flex",gap:6}}>
-            <button onClick={()=>onNav("challenges")} style={{padding:"7px 11px",borderRadius:9,background:"#EBF0FF",border:"1px solid rgba(26,79,214,.25)",color:"var(--blue)",fontSize:11,fontWeight:800,display:"flex",alignItems:"center",gap:4}}>
-              🏆 <span>Challenges</span><span style={{padding:"1px 5px",borderRadius:50,background:"rgba(26,79,214,.2)",fontSize:9,fontWeight:900}}>{challenges.length}</span>
-            </button>
-            <button onClick={()=>setShowNotifs(true)} style={{position:"relative",width:36,height:36,borderRadius:"50%",background:"#EEF2FF",border:"1px solid var(--b2)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <button onClick={()=>onNav("notifications")} style={{position:"relative",width:36,height:36,borderRadius:"50%",background:"#EEF2FF",border:"1px solid var(--b2)",display:"flex",alignItems:"center",justifyContent:"center"}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              {notifCount>0&&<span style={{position:"absolute",top:7,right:7,width:9,height:9,background:"#EF4444",borderRadius:"50%",border:"1.5px solid var(--bg)"}}/>}
+              {notifCount>0&&<span style={{position:"absolute",top:6,right:6,width:9,height:9,background:"#EF4444",borderRadius:"50%",border:"1.5px solid var(--bg)"}}/>}
+            </button>
+            <button onClick={()=>onNav("chat")} style={{position:"relative",width:36,height:36,borderRadius:"50%",background:"#EEF2FF",border:"1px solid var(--b2)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sub)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span style={{position:"absolute",top:6,right:6,width:9,height:9,background:"#1A4FD6",borderRadius:"50%",border:"1.5px solid var(--bg)"}}/>
             </button>
           </div>
         </div>
       </div>
       <div style={{maxWidth:600,margin:"0 auto",paddingBottom:90}}>
-        <div style={{margin:"12px 14px 0"}}>
-          <div style={{borderRadius:16,background:"linear-gradient(135deg,#0F1C3F,#1A4FD6)",padding:"16px",position:"relative",overflow:"hidden"}}>
-            <div style={{position:"absolute",right:-30,top:-30,width:130,height:130,borderRadius:"50%",background:"rgba(255,255,255,.05)"}}/>
-            <div style={{display:"flex",gap:12,alignItems:"center",position:"relative"}}>
-              <div style={{width:46,height:46,borderRadius:13,background:"rgba(255,255,255,.15)",border:"1px solid rgba(255,255,255,.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0}}>⚡</div>
-              <div style={{flex:1}}><div style={{fontSize:13,fontWeight:800,color:"#FFFFFF",marginBottom:3,lineHeight:1.3}}>NVIDIA posted a ₹50,000 challenge — 12 days left</div><div style={{fontSize:11,color:"rgba(255,255,255,.65)"}}>Build an AI Study Scheduler. Winner gets internship track.</div></div>
-              <button onClick={()=>onNav("challenges")} style={{padding:"9px 14px",borderRadius:10,background:"#FFFFFF",color:"#1A4FD6",border:"none",fontWeight:800,fontSize:12,flexShrink:0,boxShadow:"0 2px 8px rgba(0,0,0,.2)"}}>Enter →</button>
-            </div>
-          </div>
-        </div>
-        <div style={{margin:"10px 14px 0"}}>
-          <div className="card" style={{padding:"13px 15px",display:"flex",gap:12,alignItems:"center",border:"1.5px solid rgba(224,87,32,.18)"}}>
-            <div style={{width:42,height:42,borderRadius:12,background:"linear-gradient(135deg,#E85D20,#C2185B)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0,boxShadow:"0 3px 10px rgba(232,93,32,.3)"}}>🔥</div>
-            <div style={{flex:1}}>
-              <div style={{fontSize:12,fontWeight:800,color:"var(--text)"}}>{user.streak}-Day Streak · Don't break it!</div>
-              <div style={{height:5,borderRadius:3,background:"rgba(232,93,32,.12)",overflow:"hidden",marginTop:6}}><div style={{height:"100%",width:`${Math.min(100,(user.streak/100)*100)}%`,background:"linear-gradient(90deg,#E85D20,#1A4FD6)",borderRadius:3}}/></div>
-            </div>
-            <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:24,fontWeight:800,color:"#E85D20"}}>{user.streak}</div>
-          </div>
-        </div>
-        <div style={{padding:"10px 14px 0"}}>
-          {displayPosts.map(p=>{
-            const s=STUDENTS.find(st=>st.id===p.studentId)||{};
-            const isLiked=liked.includes(p._key);
-            const isFollowed=followed.includes(p.studentId);
-            return (
-              <div key={p._key} className="card hover" style={{marginBottom:12,overflow:"hidden"}}>
-                {p.imageUrl&&(
-                  <div style={{position:"relative"}}>
-                    <img src={p.imageUrl} alt="" style={{width:"100%",height:210,objectFit:"cover",display:"block"}}/>
-                    <div style={{position:"absolute",inset:0,background:"linear-gradient(to bottom,rgba(0,0,0,.15) 0%,transparent 35%,transparent 55%,rgba(0,0,0,.38) 100%)"}}/>
-                    <div style={{position:"absolute",top:10,left:11,display:"flex",gap:6}}>
-                      <span style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(6px)",color:"#FFD580",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:50}}>🔥 {p.day}</span>
-                      <span style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(6px)",color:"#6EE8B4",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:50}}>⏱ {p.hours}h</span>
-                    </div>
-                    <div style={{position:"absolute",bottom:10,right:12,display:"flex",alignItems:"center",gap:6}}>
-                      <div style={{display:"flex",alignItems:"center"}}>
-                        {[0,1,2].map(i=>(
-                          <img key={i} src={STUDENTS[(p.studentId+i)%STUDENTS.length].avatar} width={24} height={24} alt="" style={{borderRadius:"50%",border:"2px solid rgba(255,255,255,.9)",marginLeft:i===0?0:-8,display:"block"}}/>
-                        ))}
-                      </div>
-                      <span style={{fontSize:12,fontWeight:700,color:"#fff",textShadow:"0 1px 4px rgba(0,0,0,.5)"}}>
-                        {(p.likes+(isLiked?1:0))>=1000?((p.likes+(isLiked?1:0))/1000).toFixed(0)+"K":(p.likes+(isLiked?1:0)).toLocaleString()} Liked
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <div style={{padding:"12px 14px"}}>
-                  <div style={{display:"flex",gap:9,alignItems:"center",marginBottom:9}}>
-                    <div style={{cursor:"pointer"}} onClick={()=>onViewProfile(p.studentId)}>
-                      <Av src={p.avatar} size={34} ring={STREAM[p.stream]?.color} online={p.studentId===1} verified={s.verified}/>
-                    </div>
-                    <div style={{flex:1,cursor:"pointer"}} onClick={()=>onViewProfile(p.studentId)}>
-                      <div style={{fontWeight:700,fontSize:12,color:"var(--text)"}}>{p.name}</div>
-                      <div style={{fontSize:10,color:"var(--muted)"}}>{p.subject} · {p.time}</div>
-                    </div>
-                    <XPTag xp={p.xp}/>
-                    <button onClick={()=>toggleFollow(p.studentId)} style={{padding:"6px 14px",borderRadius:20,background:isFollowed?"#F0F2F5":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",border:"none",color:isFollowed?"#888":"#fff",fontSize:11,fontWeight:700,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
-                      {isFollowed?"Following":"+ Follow"}
-                    </button>
-                  </div>
-                  <p style={{fontSize:12,lineHeight:1.65,color:"#3D5280",marginBottom:8,whiteSpace:"pre-line"}}>{p.text}</p>
-                  <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:9}}>{p.tags.map(t=><span key={t} className="tag">{t}</span>)}</div>
-                  {/* ── Engagement Row ── */}
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8}}>
-                    {/* Left: icons gap:18px */}
-                    <div style={{display:"flex",alignItems:"center",gap:18}}>
-                      <button onClick={()=>setLiked(l=>l.includes(p._key)?l.filter(x=>x!==p._key):[...l,p._key])} style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill={isLiked?"#E0245E":"none"} stroke={isLiked?"#E0245E":"#1A1A1A"} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                      </button>
-                      <button onClick={()=>setCommentPost(p)} style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                      </button>
-                      <button onClick={()=>setSharePost(p)} style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                      </button>
-                      <button style={{background:"none",border:"none",padding:0,cursor:"pointer",lineHeight:0}}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><line x1="18" y1="8" x2="20" y2="6"/><line x1="19" y1="6" x2="20" y2="8"/></svg>
-                      </button>
-                    </div>
-
-                  </div>
-                  {/* ── Time + liked-by line ── */}
-                  <div style={{marginTop:6}}>
-                    <div style={{fontSize:11,color:"#aaa",marginBottom:2}}>{p.time}</div>
-                    <div style={{fontSize:12,color:"#555"}}>
-                      <span style={{fontWeight:700,color:"var(--text)"}}>{STUDENTS[(p.studentId+1)%STUDENTS.length].name.split(" ")[0]}</span>
-                      {", "}
-                      <span style={{fontWeight:700,color:"var(--text)"}}>{STUDENTS[(p.studentId+3)%STUDENTS.length].name.split(" ")[0]}</span>
-                      {" and others liked this post"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <div style={{padding:"10px 0 0"}}>
+          {displayPosts.map(p=>(
+            <PostCard key={p._key} p={p} liked={liked} setLiked={setLiked} saved={saved} toggleSave={toggleSave} reposted={reposted} toggleRepost={toggleRepost} followed={followed} toggleFollow={toggleFollow} setCommentPost={setCommentPost} setSharePost={setSharePost} postComments={postComments} sendCounts={sendCounts} addSend={addSend} onViewProfile={onViewProfile}/>
+          ))}
           {/* Infinite scroll sentinel */}
           <div ref={loaderRef} style={{height:60,display:"flex",alignItems:"center",justifyContent:"center"}}>
             <div style={{width:24,height:24,borderRadius:"50%",border:"2.5px solid var(--b2)",borderTopColor:"var(--blue)",animation:"spin .7s linear infinite"}}/>
           </div>
         </div>
       </div>
-      {commentPost&&<CommentDrawer post={commentPost} onClose={()=>setCommentPost(null)} onAddComment={addComment} currentUser={user}/>}
+      {commentPost&&<CommentDrawer post={commentPost} onClose={()=>setCommentPost(null)} onAddComment={addComment} currentUser={user} extraComments={postComments[commentPost.id]||[]} liked={liked} setLiked={setLiked}/>}
       {sharePost&&<ShareSheet post={sharePost} onClose={()=>setSharePost(null)}/>}
-      <BottomNav onNav={k=>k==="profile"?onViewProfile(user.id):onNav(k)} active="feed" notifCount={notifCount}/>
+      <BottomNav onNav={k=>k==="profile"?onViewProfile(user.id):onNav(k)} active="feed" notifCount={notifCount} user={user} onPost={onPost} />
     </div>
   );
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 function Login({onLogin}) {
+  const [screen,setScreen]=useState("login");
   const [email,setEmail]=useState("");
   const [pw,setPw]=useState("");
-  return (
-    <div style={{display:"flex",minHeight:"100vh"}}>
-      <div className="auth-panel" style={{width:440,flexShrink:0,background:"#0F1C3F",display:"flex",flexDirection:"column",justifyContent:"space-between",padding:"48px 40px",position:"relative",overflow:"hidden"}}>
-        <div style={{position:"absolute",inset:0,backgroundImage:"linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px)",backgroundSize:"32px 32px"}}/>
-        <div style={{position:"relative",zIndex:1}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:42}}>
-            <div style={{width:42,height:42,borderRadius:13,background:"linear-gradient(135deg,#1A4FD6,#3B5CE8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22}}>🔁</div>
-            <div><div style={{color:"white",fontWeight:900,fontSize:21,letterSpacing:"-.03em"}}>LearnLoop</div><div style={{color:"rgba(255,255,255,.3)",fontSize:9,fontWeight:700,letterSpacing:".07em"}}>STUDY · BUILD · COMPETE · GET HIRED</div></div>
-          </div>
-          <h2 style={{color:"white",fontSize:26,fontWeight:900,lineHeight:1.1,letterSpacing:"-.03em",marginBottom:12}}>Study → Build → Win<br/>→ Get hired.</h2>
-          <p style={{color:"rgba(255,255,255,.55)",fontSize:13,lineHeight:1.75,marginBottom:28}}>The platform where NEET & JEE preparation builds a verifiable career portfolio.</p>
-          {[["📅","Daily streaks build verified study history"],["🏆","Challenges = real proof of skill"],["🔨","Build projects companies actually use"],["💼","Companies hire from the challenge leaderboard"]].map(([ic,tx])=>(
-            <div key={tx} style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-              <div style={{width:28,height:28,borderRadius:8,background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.1)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}>{ic}</div>
-              <span style={{color:"rgba(255,255,255,.6)",fontSize:12}}>{tx}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{position:"relative",zIndex:1,background:"rgba(255,255,255,.07)",borderRadius:12,padding:"14px 16px",border:"1px solid rgba(255,255,255,.12)"}}>
-          <p style={{color:"rgba(255,255,255,.75)",fontSize:12,lineHeight:1.6,marginBottom:6}}>"Won the Unacademy Physics Challenge while still studying for JEE. Got hired before my board exams."</p>
-          <p style={{color:"rgba(255,255,255,.35)",fontSize:11}}>— Ishaan V., LearnLoop 2024</p>
+  const [name,setName]=useState("");
+  const [showPw,setShowPw]=useState(false);
+  const [agreed,setAgreed]=useState(false);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+
+  const handleGoogle=async()=>{
+    setLoading(true); setError("");
+    try {
+      const result=await signInWithPopup(auth,googleProvider);
+      const u=result.user;
+      const ref=doc(db,"users",u.uid);
+      const snap=await getDoc(ref);
+      if(!snap.exists()) await setDoc(ref,{uid:u.uid,name:u.displayName,email:u.email,avatar:u.photoURL,createdAt:serverTimestamp(),streak:0,xp:0});
+      onLogin(u);
+    } catch(e){ setError("Google sign-in failed. Try again."); }
+    setLoading(false);
+  };
+
+  const handleEmailLogin=async()=>{
+    if(!email.trim()||!pw.trim()){setError("Please enter email and password.");return;}
+    setLoading(true); setError("");
+    try {
+      const {signInWithEmailAndPassword}=await import("firebase/auth");
+      await signInWithEmailAndPassword(auth,email,pw);
+      onLogin({email});
+    } catch(e){ setError(e.code==="auth/invalid-credential"?"Wrong email or password.":"Login failed. Try again."); }
+    setLoading(false);
+  };
+
+  const handleEmailSignup=async()=>{
+    if(!name.trim()||!email.trim()||!pw.trim()){setError("Please fill all fields.");return;}
+    if(!agreed){setError("Please agree to the Terms of Service.");return;}
+    if(pw.length<6){setError("Password must be at least 6 characters.");return;}
+    setLoading(true); setError("");
+    try {
+      const {createUserWithEmailAndPassword,updateProfile}=await import("firebase/auth");
+      const result=await createUserWithEmailAndPassword(auth,email,pw);
+      await updateProfile(result.user,{displayName:name});
+      const ref=doc(db,"users",result.user.uid);
+      await setDoc(ref,{uid:result.user.uid,name,email,avatar:null,createdAt:serverTimestamp(),streak:0,xp:0});
+      onLogin(result.user);
+    } catch(e){ setError(e.code==="auth/email-already-in-use"?"Email already registered. Sign in instead.":"Signup failed. Try again."); }
+    setLoading(false);
+  };
+
+  const inputStyle={width:"100%",padding:"13px 14px",borderRadius:12,border:"1.5px solid #E4EAF6",fontSize:13,color:"#1A1A2E",outline:"none",background:"#F8FAFD",boxSizing:"border-box",fontFamily:"inherit"};
+
+  const Wrapper=({children})=>(
+    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#EFF4FB,#E8EDFB)",display:"flex",flexDirection:"column"}}>
+      <div style={{padding:"52px 20px 0",display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+        {screen==="signup"&&<button onClick={()=>{setScreen("login");setError("");}} style={{position:"absolute",left:20,width:34,height:34,borderRadius:"50%",background:"#fff",border:"1px solid #E0E8F4",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2.5" strokeLinecap="round"><polyline points="15,18 9,12 15,6"/></svg>
+        </button>}
+        <div style={{fontSize:18,fontWeight:900,color:"#1A4FD6",letterSpacing:"-.02em",display:"flex",alignItems:"center",gap:8}}>
+          <svg width="24" height="14" viewBox="0 0 60 34" fill="none"><path d="M30 17C30 17 20 4 10 4C2 4 2 30 10 30C20 30 30 17 30 17Z" stroke="#1A4FD6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><path d="M30 17C30 17 40 4 50 4C58 4 58 30 50 30C40 30 30 17 30 17Z" stroke="#7C3AED" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          Infinity
         </div>
       </div>
-      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 20px",background:"#EFF4FB",overflowY:"auto"}}>
-        <div style={{width:"100%",maxWidth:360}} className="fu">
-          <div style={{display:"flex",alignItems:"center",gap:9,marginBottom:28}}>
-            <div style={{width:36,height:36,borderRadius:11,background:"linear-gradient(135deg,#1A4FD6,#3B5CE8)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🔁</div>
-            <div><div style={{fontWeight:900,fontSize:15,color:"var(--text)",letterSpacing:"-.03em"}}>LearnLoop</div><div style={{fontSize:9,color:"var(--muted)",fontWeight:700,letterSpacing:".06em"}}>STUDY · BUILD · COMPETE · GET HIRED</div></div>
-          </div>
-          <h1 style={{fontSize:20,fontWeight:800,color:"var(--text)",marginBottom:4}}>Welcome back 👋</h1>
-          <p style={{color:"var(--muted)",fontSize:12,marginBottom:22}}>Your streak, challenges, and rank are waiting.</p>
-          <button onClick={onLogin} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,width:"100%",padding:"11px",background:"#EEF2FF",border:"1.5px solid var(--b2)",borderRadius:11,fontSize:13,fontWeight:600,color:"var(--text)",marginBottom:16,cursor:"pointer"}}>
-            <svg width="17" height="17" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34D399"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Continue with Google
-          </button>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-            <div style={{flex:1,height:1,background:"#EBF0FF"}}/><span style={{color:"var(--muted)",fontSize:11}}>or</span><div style={{flex:1,height:1,background:"#EBF0FF"}}/>
-          </div>
-          {[["Email","email","you@example.com",email,setEmail],["Password","password","Your password",pw,setPw]].map(([l,t,ph,v,sv])=>(
-            <div key={l} style={{marginBottom:12}}>
-              <label style={{display:"block",fontSize:11,fontWeight:600,color:"var(--sub)",marginBottom:5}}>{l}</label>
-              <input className="inp" style={{paddingLeft:14}} type={t} placeholder={ph} value={v} onChange={e=>sv(e.target.value)}/>
-            </div>
-          ))}
-          <button className="btn-primary" onClick={onLogin} style={{marginTop:6}}>Sign in →</button>
-          <p style={{textAlign:"center",marginTop:16,fontSize:11,color:"var(--muted)"}}>New? <span style={{color:"var(--blue)",fontWeight:700,cursor:"pointer"}} onClick={onLogin}>Create free account</span></p>
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"20px 20px 40px"}}>
+        <div style={{background:"#fff",borderRadius:24,padding:"28px 24px",boxShadow:"0 4px 24px rgba(15,28,63,.08)"}}>
+          {children}
         </div>
       </div>
     </div>
+  );
+
+  const GoogleBtn=()=>(
+    <button onClick={handleGoogle} disabled={loading} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,width:"100%",padding:"13px",background:loading?"#f5f5f5":"#fff",border:"1.5px solid #E4EAF6",borderRadius:50,fontSize:14,fontWeight:700,color:"#1A1A2E",cursor:loading?"not-allowed":"pointer",boxShadow:"0 2px 8px rgba(15,28,63,.07)",transition:"all .2s"}}>
+      <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      {loading?"Signing in...":"Continue with Google"}
+    </button>
+  );
+
+  const Divider=()=>(
+    <div style={{display:"flex",alignItems:"center",gap:10,margin:"18px 0"}}>
+      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
+      <span style={{fontSize:12,color:"#bbb",fontWeight:500}}>or</span>
+      <div style={{flex:1,height:1,background:"#EEF2FB"}}/>
+    </div>
+  );
+
+  if(screen==="login") return (
+    <Wrapper>
+      <div style={{fontSize:22,fontWeight:900,color:"#1A1A2E",marginBottom:4,textAlign:"center"}}>Welcome back 👋</div>
+      <div style={{fontSize:13,color:"#aaa",textAlign:"center",marginBottom:22}}>Sign in to continue your journey</div>
+
+      <GoogleBtn/>
+      <Divider/>
+
+      {error&&<div style={{background:"#FFF0F0",border:"1px solid #FFCDD2",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#C62828",marginBottom:14,textAlign:"center"}}>{error}</div>}
+
+      <div style={{marginBottom:12}}>
+        <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Email</label>
+        <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
+      </div>
+      <div style={{marginBottom:10}}>
+        <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Password</label>
+        <div style={{position:"relative"}}>
+          <input style={{...inputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleEmailLogin()}/>
+          <button onClick={()=>setShowPw(v=>!v)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#aaa",fontSize:16,padding:0}}>{showPw?"👁":"🙈"}</button>
+        </div>
+      </div>
+      <div style={{textAlign:"right",marginBottom:20}}>
+        <span style={{fontSize:12,color:"#1A4FD6",fontWeight:600,cursor:"pointer"}}>Forgot password?</span>
+      </div>
+      <button onClick={handleEmailLogin} disabled={loading} style={{width:"100%",padding:"14px",borderRadius:50,background:loading?"#9BB4E8":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",border:"none",color:"#fff",fontSize:15,fontWeight:800,cursor:loading?"not-allowed":"pointer",boxShadow:"0 4px 20px rgba(26,79,214,.35)"}}>
+        {loading?"Signing in...":"Sign In"}
+      </button>
+      <div style={{textAlign:"center",marginTop:18,fontSize:12,color:"#aaa"}}>
+        Don't have an account? <span onClick={()=>{setScreen("signup");setError("");}} style={{color:"#1A4FD6",fontWeight:700,cursor:"pointer"}}>Sign up</span>
+      </div>
+    </Wrapper>
+  );
+
+  return (
+    <Wrapper>
+      <div style={{fontSize:22,fontWeight:900,color:"#1A1A2E",marginBottom:4,textAlign:"center"}}>Create Account 🚀</div>
+      <div style={{fontSize:13,color:"#aaa",textAlign:"center",marginBottom:22}}>Join 12,000+ students on Infinity</div>
+
+      <GoogleBtn/>
+      <Divider/>
+
+      {error&&<div style={{background:"#FFF0F0",border:"1px solid #FFCDD2",borderRadius:10,padding:"10px 14px",fontSize:12,color:"#C62828",marginBottom:14,textAlign:"center"}}>{error}</div>}
+
+      <div style={{marginBottom:12}}>
+        <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Full Name</label>
+        <input style={inputStyle} type="text" placeholder="Your full name" value={name} onChange={e=>setName(e.target.value)}/>
+      </div>
+      <div style={{marginBottom:12}}>
+        <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Email</label>
+        <input style={inputStyle} type="email" placeholder="you@example.com" value={email} onChange={e=>setEmail(e.target.value)}/>
+      </div>
+      <div style={{marginBottom:16}}>
+        <label style={{fontSize:12,fontWeight:600,color:"#555",display:"block",marginBottom:5}}>Password <span style={{color:"#bbb",fontWeight:400}}>(min 6 chars)</span></label>
+        <div style={{position:"relative"}}>
+          <input style={{...inputStyle,paddingRight:44}} type={showPw?"text":"password"} placeholder="••••••••" value={pw} onChange={e=>setPw(e.target.value)}/>
+          <button onClick={()=>setShowPw(v=>!v)} style={{position:"absolute",right:14,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",color:"#aaa",fontSize:16,padding:0}}>{showPw?"👁":"🙈"}</button>
+        </div>
+      </div>
+      <label style={{display:"flex",alignItems:"center",gap:8,fontSize:12,color:"#888",marginBottom:20,cursor:"pointer"}}>
+        <input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)} style={{accentColor:"#1A4FD6",width:14,height:14}}/>
+        I agree to the <span style={{color:"#1A4FD6",fontWeight:600}}>Terms of Service</span>
+      </label>
+      <button onClick={handleEmailSignup} disabled={loading} style={{width:"100%",padding:"14px",borderRadius:50,background:loading?"#9BB4E8":"linear-gradient(135deg,#1A4FD6,#3B5CE8)",border:"none",color:"#fff",fontSize:15,fontWeight:800,cursor:loading?"not-allowed":"pointer",boxShadow:"0 4px 20px rgba(26,79,214,.35)"}}>
+        {loading?"Creating account...":"Create Account"}
+      </button>
+      <div style={{textAlign:"center",marginTop:18,fontSize:12,color:"#aaa"}}>
+        Already have an account? <span onClick={()=>{setScreen("login");setError("");}} style={{color:"#1A4FD6",fontWeight:700,cursor:"pointer"}}>Sign in</span>
+      </div>
+    </Wrapper>
   );
 }
 
@@ -1477,7 +3171,12 @@ export default function App() {
   const [history,setHistory]=useState(INIT_HISTORY);
   const [viewStudentId,setViewStudentId]=useState(null);
   const [followed,setFollowed]=useState([]);
+  const [showCreate,setShowCreate]=useState(false);
   const toggleFollow=id=>setFollowed(f=>f.includes(id)?f.filter(x=>x!==id):[...f,id]);
+
+  const pushToast=(toast)=>toastBus.emit(toast);
+
+  const addNotif=(notif)=>toastBus.emit(notif);
 
   useEffect(()=>{
     // Inject Google Fonts
@@ -1491,6 +3190,8 @@ export default function App() {
     document.head.appendChild(style);
     return()=>{document.head.removeChild(link);document.head.removeChild(style);};
   },[]);
+
+  // Live notifications disabled
 
   const navigate=p=>{setActiveChallenge(null);setPage(p);};
   const unread=notifs.filter(n=>!n.read).length;
@@ -1514,7 +3215,7 @@ export default function App() {
     setNotifs(p=>[{id:p.length+1,text:`Submitted to ${c.title} — +${c.xpReward} XP!`,time:"just now",read:false,icon:"⚡"},...p]);
   };
 
-  const shared={onNav:navigate,user,notifs,notifCount:unread,submissions,challenges:CHALLENGES,onMarkAllRead:markAllRead,onVoteSubmission:voteSubmission,onCommentSubmission:commentOnSubmission,onViewProfile:setViewStudentId,followed,onFollow:toggleFollow};
+  const shared={onNav:navigate,user,notifs,notifCount:unread,submissions,challenges:CHALLENGES,onMarkAllRead:markAllRead,onVoteSubmission:voteSubmission,onCommentSubmission:commentOnSubmission,onViewProfile:setViewStudentId,followed,onFollow:toggleFollow,onPost:()=>setShowCreate(true)};
 
   if(activeChallenge) return (
     <><ChallengeDetail c={activeChallenge} onBack={()=>setActiveChallenge(null)} user={user} submissions={submissions} onVoteSubmission={voteSubmission} onCommentSubmission={commentOnSubmission} onSubmitChallenge={submitChallenge}/></>
@@ -1523,16 +3224,20 @@ export default function App() {
   const pages={
     login:                ()=><Login onLogin={()=>navigate("feed")}/>,
     feed:                 ()=><Feed {...shared}/>,
+    battle:               ()=><DailyBattle {...shared}/>,
     challenges:           ()=><Challenges {...shared} onOpenChallenge={setActiveChallenge}/>,
-    opportunities:        ()=><Opportunities {...shared}/>,
-    showcase:             ()=><Showcase {...shared}/>,
+    discover:             ()=><Discover {...shared} onViewProfile={setViewStudentId}/>,
+    notifications:        ()=><NotificationsPage {...shared}/>,
+    chat:                 ()=><ChatList {...shared}/>,
     profile:              ()=><Profile {...shared} history={history}/>,
     "challenge-portfolio":()=><ChallengePortfolio onBack={()=>navigate("profile")} user={user} history={history}/>,
   };
 
   const Page=pages[page]||pages["login"];
-  return <>
+  return <ErrorBoundary>
     <Page/>
     {viewStudentId!=null&&<StudentProfile studentId={viewStudentId} onBack={()=>setViewStudentId(null)} onFollow={toggleFollow} followed={followed}/>}
-  </>;
+    {showCreate&&<CreatePost user={user} onClose={()=>setShowCreate(false)} onSubmit={()=>setShowCreate(false)}/>}
+    <ToastStack/>
+  </ErrorBoundary>;
 }
